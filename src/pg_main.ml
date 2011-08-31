@@ -1,4 +1,3 @@
 
-let f _ () () =
-	let r = D_main.main () in
-	Lwt.return r
+let f sp () () =
+	D_main.main ~sp ([], [])
