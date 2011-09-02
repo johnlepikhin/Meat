@@ -1,13 +1,16 @@
-<*.ml>: syntax_camlp4o, pkg_lwt.syntax, pkg_pa_le
+<*.ml>: syntax_camlp4o, pkg_lwt.syntax, pkg_pa_le, pkg_threads
+<*.mli>: pkg_lwt
 "services.ml": pkg_ocsigen.ext.eliom
 
 <pg_*.ml>: pkg_pgocaml.syntax, pkg_pgocaml
 "pGOCaml.ml": pkg_pgocaml.syntax, pkg_pgocaml
 "table.ml": pkg_pgocaml.syntax, pkg_pgocaml
+<ocsipersist*.ml>: pkg_pgocaml.syntax, pkg_pgocaml, pkg_ocsigen.server
 
 <d_*.ml>: pkg_ocsigen_xhtml.syntax
 <js_*.ml>: pkg_js_of_ocaml, pkg_js_of_ocaml.syntax
 "page_template.ml": pkg_ocsigen_xhtml.syntax
 "eliom_no_meat.ml": pkg_ocsigen.ext.eliom
 <*.cmxa>: pkg_pgocaml
+<*.cmxs>: pkg_pgocaml, pkg_threads
 <js_*.byte>: pkg_lwt, pkg_js_of_ocaml

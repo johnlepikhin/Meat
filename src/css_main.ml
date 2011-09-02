@@ -121,5 +121,23 @@ module Search = struct
 end
 
 module Recipe = struct
-
+	module Ingridients = struct
+		let container_ul = make (Id int_id) []
+		
+		let ingridient_li = make (Id int_id) []
+	end
+	module Parts = struct
+		let container_div = make (Id int_id) []
+		
+		let part_div = make (Id int_id) [
+			"padding", "10px";
+		]
+		
+		let part_number = make (Id int_id) [
+			"display", "inline";
+			"font-size", "1.5em";
+			"padding", "10px";
+		]
+		
+	end
 end

@@ -1,13 +1,14 @@
 open Printf
 open Ocamlbuild_plugin
 
-let ocsigen = "ocsigen"
+let ocsigen = "ocsigen.opt"
 let ocsigen_modules_path = "ocsigen/modules"
 let ocsigen_js_path = "ocsigen/js"
 let ocsigen_css_path = "ocsigen/css"
 
 let targets = [
-	("eliom_no_meat.cma", Some ocsigen_modules_path);
+	("eliom_no_meat.cmxs", Some ocsigen_modules_path);
+	("ocsipersist.cmxs", Some ocsigen_modules_path);
 	("js_search.js", Some ocsigen_js_path);
 	("css_main.css", Some ocsigen_css_path);
 ]
@@ -85,7 +86,10 @@ let _ =
 			rule_cmxs ();
 		| After_rules ->
 			flag ["ocaml"; "link"; "program"] & A"-linkpkg";
-			flag ["ocaml"; "compile"] (S[A "-thread"]);
+(*			flag ["ocaml"; "compile"] (S[A "-thread"]); *)
+			flag ["ocaml"; "pkg_threads"; "compile"] (S[A "-thread"]);
+			flag ["ocaml"; "pkg_threads"; "link"] (S[A "-thread"]);
+			flag ["ocaml"; "pkg_threads"; "infer_interface"] (S[A "-thread"]);
 
 			List.iter
 				(fun package -> flag_all ("pkg_" ^ package) (S[A"-package"; A package]))
