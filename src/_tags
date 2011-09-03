@@ -1,11 +1,7 @@
-<*.ml>: syntax_camlp4o, pkg_lwt.syntax, pkg_pa_le, pkg_threads
+<*.ml>: syntax_camlp4o, pkg_lwt.syntax, pkg_pa_le, pkg_threads, pkg_pgocaml.syntax, pkg_pgocaml, pkg_ocsigen.ext.eliom
 <*.mli>: pkg_lwt
-"services.ml": pkg_ocsigen.ext.eliom
 
-<pg_*.ml>: pkg_pgocaml.syntax, pkg_pgocaml
-"pGOCaml.ml": pkg_pgocaml.syntax, pkg_pgocaml
-"table.ml": pkg_pgocaml.syntax, pkg_pgocaml
-<ocsipersist*.ml>: pkg_pgocaml.syntax, pkg_pgocaml, pkg_ocsigen.server
+<ocsipersist*.ml>: pkg_ocsigen.server
 
 <d_*.ml>: pkg_ocsigen_xhtml.syntax
 <js_*.ml>: pkg_js_of_ocaml, pkg_js_of_ocaml.syntax
@@ -14,3 +10,6 @@
 <*.cmxa>: pkg_pgocaml
 <*.cmxs>: pkg_pgocaml, pkg_threads
 <js_*.byte>: pkg_lwt, pkg_js_of_ocaml
+
+<*.native>: pkg_pgocaml, pkg_threads, pkg_lwt, pkg_lwt.unix
+

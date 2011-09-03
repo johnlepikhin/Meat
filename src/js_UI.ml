@@ -1,3 +1,4 @@
+open Js_primitives
 open Js_common
 open Js
 

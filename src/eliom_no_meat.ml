@@ -35,4 +35,10 @@ module API = struct
 	let recipe_name_complete = microml Services.API.recipe_name_complete Pg_API.recipe_name_complete
 
 	let recipe_ingridients = microml Services.API.recipe_ingridients Pg_API.recipe_ingridients
+
+	let login_no_post = microml Services.API.login_no_post Pg_API.no_post
+	let login = microml Services.API.login Pg_API.login
+
+	let logout_no_post = microml Services.API.logout_no_post Pg_API.no_post
+	let logout = microml Services.API.logout Pg_API.logout
 end

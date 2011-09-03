@@ -2,6 +2,11 @@
 open Microml
 open Db
 
+let no_post sp () () =
+	lwt _ = Eliom_sessions.close_session ~sp () in
+	lwt _ = Eliom_sessions.set_persistent_session_data ~table:Session.s ~sp "john" in
+	Lwt.return (String "You must POST data")
+
 let recipe_name_complete sp name () =
 	let name = name ^ "%" in
 	lwt r = PGSQL(h) "select name
@@ -20,3 +25,12 @@ let recipe_ingridients sp name () =
 	in
 	let r = mapl r (String __) in
 	Lwt.return (List r)
+
+let login sp () (username) =
+	lwt _ = Eliom_sessions.close_session ~sp () in
+	lwt _ = Eliom_sessions.set_persistent_session_data ~table:Session.s ~sp username in
+	Lwt.return (List [String "username"; String username])
+
+let logout sp () () =
+	lwt _ = Eliom_sessions.close_session ~sp () in
+	Lwt.return (List [String "ok"])

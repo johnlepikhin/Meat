@@ -12,21 +12,13 @@ module ShowIngridients = struct
 		let make_args msg = [| Js.Unsafe.inject msg |]
 
 		let f name =
-			let make_msg = function
-				| Microml.String _ -> None
-				| Microml.List lst ->
-					let rec loop = function
-						| Microml.String s :: tl -> s :: loop tl
-						| Microml.List _ :: tl -> loop tl
-						| [] -> []
-					in
-					let l = loop lst in
-					let r = String.concat "\n" l in
-					Some r
+			let make_msg lst =
+				let r = String.concat "\n" lst in
+				Some r
 			in
 
 			let call name =
-				lwt r = Js_common.request ~get_args:["q", (to_string name)] Common.API.path_recipe_ingridients in
+				lwt r = Js_API.request_list ~get_args:["q", (to_string name)] Common.API.path_recipe_ingridients in
 				let msg = make_msg r in
 				match msg with
 					| None -> Lwt.return ()

@@ -3,6 +3,26 @@ open Css
 open Selector
 
 module Main = struct
+	module Head = struct
+		let div = make (Id int_id) []
+	end
+
+	module Login = struct
+		let main_div = make (Id int_id) [
+			"background", "#90ff90";
+		]
+
+		let login_container_div = make (Id int_id) []
+
+		let username_input = make (Id int_id) []
+		let username_div = make (Id int_id) []
+		let username_submit = make (Id int_id) []
+
+		let logout_container_div = make (Id int_id) []
+
+		let logout_div = make (Id int_id) []
+	end
+
 	module Footer = struct
 		let div = make (Id int_id) [
 			"text-align", "center";
@@ -121,6 +141,11 @@ module Search = struct
 end
 
 module Recipe = struct
+	let name_div = make (Id int_id) [
+		"text-align", "center";
+		"font-size", "2em";
+	]
+
 	module Ingridients = struct
 		let container_ul = make (Id int_id) []
 		

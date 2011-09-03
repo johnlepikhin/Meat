@@ -24,6 +24,6 @@ let f sp name () =
 		| [(id, name, ingridients_count)] ->
 			lwt ingridients = get_ingridients id in
 			lwt parts = get_parts id in
-			D_show_recipe.f ~ingridients_count ~ingridients ~parts name
+			D_show_recipe.f ~ingridients_count ~ingridients ~parts ~sp name
 		| _ ->
-			D_show_recipe.not_found name
+			D_show_recipe.not_found ~sp name

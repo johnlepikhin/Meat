@@ -1,18 +1,19 @@
 
 open Js
+open Js_primitives
 open Js_common
 open Js_UI
 
 module Import1 = Js_results
 
 module DH = Dom_html
-module CF = Css_main.Search.Form
-module FS = Common.Search
-
-let input_ingridient = EID.init FS.ingridient_id DH.CoerceTo.input
+module C = Common
 
 module Ingridients = struct
+	module FS = C.Search
+	module CF = Css_main.Search.Form
 
+	let input_ingridient = EID.init FS.ingridient_id DH.CoerceTo.input
 	let form = EID.init FS.form_id DH.CoerceTo.form
 
 	module Selection = struct
@@ -22,7 +23,7 @@ module Ingridients = struct
 		let list = ref []
 
 		let current () =
-			let r = List.filter (fun (n, _) -> n = FS.ingridient) URL.args in
+			let r = List.filter (fun (n, _) -> n = FS.ingridient) Js_API.URL.args in
 			List.map (fun (_, v) -> v) r
 
 		let delete name div input _ =
@@ -165,19 +166,12 @@ module Ingridients = struct
 			selection := None;
 			lwt ac = autocomplete_div () in
 			lwt _ = clear () in
-			let rec loop = function
-				| [] -> ()
-				| Microml.String name :: tl ->
-					let div = add ~ac name in
-					begin
-						match div with
-							| None -> ()
-							| Some div -> list := (name, div) :: !list;
-					end;
-					loop tl;
-				| Microml.List _ :: tl -> loop tl
-			in
-			loop lst;
+			eachl lst (
+				let div = add ~ac __ in
+				match div with
+					| None -> ()
+					| Some div -> list := (__, div) :: !list
+			);
 			init_keys ();
 			if List.length lst > 0 then
 				ac##className <- string CF.container_div_full
@@ -198,11 +192,9 @@ module Ingridients = struct
 				let v = to_string (el##value) in
 				if v <> !last_text && String.length v > 0 then
 				begin
-					lwt result = request ~get_args:["q", v] Common.API.path_recipe_name_complete in
+					lwt lst = Js_API.request_list ~get_args:["q", v] Common.API.path_recipe_name_complete in
 					last_text := v;
-					match result with
-						| Microml.String e -> Lwt.return ()
-						| Microml.List lst -> Autocomplete.init lst
+					Autocomplete.init lst
 				end
 				else
 					Lwt.return ()
@@ -256,9 +248,94 @@ module Ingridients = struct
 
 end
 
-let search_init _ =
+module Login = struct
+	let login_div = EID.init C.Login.login_container_id DH.CoerceTo.div
+	let logout_div = EID.init C.Login.logout_container_id DH.CoerceTo.div
+	let logout_button_div = EID.init C.Login.logout_id DH.CoerceTo.div
+	let username_input = EID.init C.Login.username_input_id DH.CoerceTo.input
+	let username_submit = EID.init C.Login.username_submit_id DH.CoerceTo.input
+	let username_div = EID.init C.Login.username_div_id DH.CoerceTo.div
+
+	let show_login () =
+		lwt login_div = login_div () in
+		login_div##style##display <- string "block";
+		lwt logout_div = logout_div () in
+
+		logout_div##style##display <- string "none";
+		Lwt.return ()
+
+	let show_logout uname =
+		lwt login_div = login_div () in
+		login_div##style##display <- string "none";
+
+		lwt logout_div = logout_div () in
+		lwt username_div = username_div () in
+		logout_div##style##display <- string "block";
+		username_div##innerHTML <- string uname;
+		Lwt.return ()
+
+	let do_login _ =
+		lwt username_input = username_input () in
+		let username = to_string (username_input##value) in
+		lwt r = Js_API.request_list ~get_args:[] ~post_args:["username", username] C.API.path_login in
+		match r with
+			| ["username"; s] ->
+				show_logout s
+			| ["error"; s] ->
+				alert s;
+				Lwt.return ()
+			| _ ->
+				alert "Неожиданный ответ";
+				Lwt.return ()
+
+	let do_logout _ =
+		lwt r = Js_API.request_list ~get_args:[] ~post_args:[] C.API.path_logout in
+		match r with
+			| ["ok"] ->
+				show_login ()
+			| ["error"; s] ->
+				alert s;
+				Lwt.return ()
+			| _ ->
+				alert "Неожиданный ответ";
+				Lwt.return ()
+
+	let init () =
+		let username_var = Js_fun.var C.Login.username_var in
+		lwt username_submit = username_submit () in
+		username_submit##onmouseup <- handler do_login _true;
+		lwt logout_button_div = logout_button_div () in
+		logout_button_div##onmouseup <- handler do_logout _true;
+		match username_var with
+			| None -> show_login ()
+			| Some username -> show_logout username
+end
+
+module PageMain = struct
+	let init () =
+		ignore (Ingridients.init ())
+end
+
+module PageSearchResults = struct
+	let init () =
+		ignore (Ingridients.init ())
+end
+
+module PageShowRecipe = struct
+	let init () =
+		()
+end
+
+let init _ =
 	ignore (Js_UI.KeyEvent.init ());
-	ignore (Ingridients.init ());
+	ignore (Login.init ());
+	let page_name = Js_fun.string C.page_name_var in
+	let _ = match page_name with
+		| Some v when v = C.PageName.main -> PageMain.init ()
+		| Some v when v = C.PageName.search_results -> PageSearchResults.init ()
+		| Some v when v = C.PageName.show_recipe -> PageShowRecipe.init ()
+		| _ -> ()
+	in
 	Lwt.return ()
 
-let _ = window##onload <- handler search_init _true
+let _ = window##onload <- handler init _true
