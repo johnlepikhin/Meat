@@ -192,7 +192,7 @@ module Ingridients = struct
 				let v = to_string (el##value) in
 				if v <> !last_text && String.length v > 0 then
 				begin
-					lwt lst = Js_API.request_list ~get_args:["q", v] Common.API.path_recipe_name_complete in
+					lwt lst = Js_API.request ~args:["q", v] Common.API.path_recipe_name_complete in
 					last_text := v;
 					Autocomplete.init lst
 				end
@@ -277,33 +277,34 @@ module Login = struct
 	let do_login _ =
 		lwt username_input = username_input () in
 		let username = to_string (username_input##value) in
-		lwt r = Js_API.request_list ~get_args:[] ~post_args:["username", username] C.API.path_login in
+		lwt r = Js_API.request ~args:["username", username] C.API.path_login in
 		match r with
-			| ["username"; s] ->
-				show_logout s
-			| ["error"; s] ->
+			| API.Login.Ok username ->
+				show_logout username
+			| API.Login.Error s -> 
 				alert s;
-				Lwt.return ()
-			| _ ->
-				alert "Неожиданный ответ";
 				Lwt.return ()
 
 	let do_logout _ =
-		lwt r = Js_API.request_list ~get_args:[] ~post_args:[] C.API.path_logout in
+		lwt r = Js_API.request ~args:[] C.API.path_logout in
 		match r with
-			| ["ok"] ->
-				show_login ()
-			| ["error"; s] ->
+			| API.Action.Ok -> show_login ()
+			| API.Action.Error s ->
 				alert s;
 				Lwt.return ()
-			| _ ->
-				alert "Неожиданный ответ";
-				Lwt.return ()
+
+	let do_kb_login e =
+		if e##keyCode = 13 then
+			do_login ()
+		else
+			Lwt.return ()
 
 	let init () =
 		let username_var = Js_fun.var C.Login.username_var in
 		lwt username_submit = username_submit () in
+		lwt username_input = username_input () in
 		username_submit##onmouseup <- handler do_login _true;
+		username_input##onkeypress <- handler do_kb_login _true;
 		lwt logout_button_div = logout_button_div () in
 		logout_button_div##onmouseup <- handler do_logout _true;
 		match username_var with

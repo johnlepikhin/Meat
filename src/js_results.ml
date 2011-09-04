@@ -12,17 +12,10 @@ module ShowIngridients = struct
 		let make_args msg = [| Js.Unsafe.inject msg |]
 
 		let f name =
-			let make_msg lst =
-				let r = String.concat "\n" lst in
-				Some r
-			in
-
 			let call name =
-				lwt r = Js_API.request_list ~get_args:["q", (to_string name)] Common.API.path_recipe_ingridients in
-				let msg = make_msg r in
-				match msg with
-					| None -> Lwt.return ()
-					| Some msg -> Js_UI.Hint.show msg
+				lwt r = Js_API.request ~args:["q", (to_string name)] Common.API.path_recipe_ingridients in
+				let msg = String.concat "\n" r in
+				Js_UI.Hint.show msg
 			in
 			Js_common.wrap_error call name
 	end

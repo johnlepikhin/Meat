@@ -22,27 +22,21 @@ let show_recipe = new_service
 	()
 
 module API = struct
+	module C = Common.API
+
 	let no_post_params path = new_service
 		~path
 		~get_params:unit
 		()
 
-	let no_post_service path post_params =
+	let api path params =
 		let fallback = no_post_params path in
-		let service = new_post_service ~fallback ~post_params () in
+		let service = new_post_service ~fallback ~post_params:params () in
 		fallback, service
 
-	let recipe_name_complete = new_service
-		~path:Common.API.path_recipe_name_complete
-		~get_params:(string "q")
-		()
+	let recipe_name_complete = api C.path_recipe_name_complete (string "q")
+	let recipe_ingridients = api C.path_recipe_ingridients (string "q")
 
-	let recipe_ingridients = new_service
-		~path:Common.API.path_recipe_ingridients
-		~get_params:(string "q")
-		()
-
-	let (login_no_post, login) = no_post_service Common.API.path_login (string "username")
-
-	let (logout_no_post, logout) = no_post_service Common.API.path_logout unit
+	let login = api C.path_login (string "username")
+	let logout = api C.path_logout unit
 end

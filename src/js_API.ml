@@ -2,7 +2,6 @@ open Js
 open Js_primitives
 
 module DH = Dom_html
-module M = Microml
 
 let (is_ssl, url) =
 	match Url.Current.get () with
@@ -49,45 +48,39 @@ module URL = struct
 end
 
 let protocol_error e = Lwt.fail (Request e)
-	
-let request ~get_args ~post_args func =
-	lwt url = URL.make func get_args in
-	lwt r = match post_args with
-		| None -> XmlHttpRequest.perform url
-		| Some post_args -> XmlHttpRequest.perform ~post_args url
-	in
-	lwt r =
-		if (r.XmlHttpRequest.code = 200) then
-			try
-				let r = Microml.of_string r.XmlHttpRequest.content in
-				Lwt.return r
-			with
-				| e -> protocol_error (Printexc.to_string e)
+
+let decode s =
+	let l = String.length s in
+	let b = Buffer.create l in
+	let rec loop pos =
+		if pos >= l then
+			()
 		else
-			protocol_error ("HTTP response code = " ^ (string_of_int r.XmlHttpRequest.code) ^ "\n\n" ^ r.XmlHttpRequest.content)
+			match s.[pos] with
+				| '\\' ->
+					let h = String.sub s (pos+1) 2 in
+					let h = "0x" ^ h in
+					let c = int_of_string h in
+					let c = Char.chr c in
+					Buffer.add_char b c;
+					loop (pos+3)
+				| c ->
+					Buffer.add_char b c;
+					loop (pos+1)
 	in
-	Lwt.return r
+	loop 0;
+	Buffer.contents b
 
-let request_a ~get_args ~post_args func =
-	lwt r = request ~get_args ~post_args func in
-	match r with
-		| M.String s -> Lwt.fail (API s)
-		| M.List v -> Lwt.return v
-
-let request_1 ~get_args ?post_args func =
-	lwt r = request_a ~get_args ~post_args func in
-	match r with
-		| [M.String v] -> Lwt.return v
-		| _ -> Lwt.fail Invalid_response
-
-let request_list ~get_args ?post_args func =
-	lwt r = request_a ~get_args ~post_args func in
-	let rec loop = function
-		| [] -> Lwt.return []
-		| M.String v :: tl ->
-			lwt tl = loop tl in
-			Lwt.return (v :: tl)
-		| _ -> Lwt.fail Invalid_response
-	in
-	loop r
-
+let request ~args func =
+	lwt url = URL.make func [] in
+	lwt r = XmlHttpRequest.perform ~post_args:args url in
+	if (r.XmlHttpRequest.code = 200) then
+	begin
+		let r = decode r.XmlHttpRequest.content in
+		let r = Marshal.from_string r 0 in
+		match r with
+			| API.Data v -> Lwt.return v
+			| API.Error s -> protocol_error s
+	end
+	else
+		protocol_error ("HTTP response code = " ^ (string_of_int r.XmlHttpRequest.code) ^ "\n\n" ^ r.XmlHttpRequest.content)

@@ -11,34 +11,27 @@ let search_results = xhtml Services.search_results Pg_search_results.f
 let show_recipe = xhtml Services.show_recipe Pg_show_recipe.f
 
 module API = struct
-	open Microml
+	module S = Services.API
+	module P = Pg_API
 
 	let content_type = "text/plain"
 
-	let error_handler =
-		let e = String "API error" in
-		let r = to_string e in
-		let r = r, content_type in
-		fun _ _ -> Lwt.return r
-
-	let microml service f =
+	let make service f =
 		let f sp get post =
-			lwt mml = f sp get post in
-			let content = Microml.to_string mml in
-			Lwt.return (content, content_type)
+			lwt r = f sp post in
+			Lwt.return (r, content_type)
 		in
 		Text.register
-			~error_handler
 			~service
+			~charset:"x-user-defined"
 			f
 
-	let recipe_name_complete = microml Services.API.recipe_name_complete Pg_API.recipe_name_complete
+	let register (service_no_post, service) f =
+		make service_no_post Pg_API.no_post;
+		make service f
 
-	let recipe_ingridients = microml Services.API.recipe_ingridients Pg_API.recipe_ingridients
-
-	let login_no_post = microml Services.API.login_no_post Pg_API.no_post
-	let login = microml Services.API.login Pg_API.login
-
-	let logout_no_post = microml Services.API.logout_no_post Pg_API.no_post
-	let logout = microml Services.API.logout Pg_API.logout
+	let _ = register S.recipe_name_complete P.recipe_name_complete
+	let _ = register S.recipe_ingridients P.recipe_ingridients
+	let _ = register S.login P.login
+	let _ = register S.logout P.logout
 end
