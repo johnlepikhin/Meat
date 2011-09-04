@@ -76,11 +76,14 @@ let request ~args func =
 	lwt r = XmlHttpRequest.perform ~post_args:args url in
 	if (r.XmlHttpRequest.code = 200) then
 	begin
-		let r = decode r.XmlHttpRequest.content in
-		let r = Marshal.from_string r 0 in
-		match r with
-			| API.Data v -> Lwt.return v
-			| API.Error s -> protocol_error s
+		try
+			let r = decode r.XmlHttpRequest.content in
+			let r = Marshal.from_string r 0 in
+			match r with
+				| API.Data v -> Lwt.return v
+				| API.Error s -> protocol_error s
+		with
+			| _ -> protocol_error "Получены некорректные данные от сервера"
 	end
 	else
 		protocol_error ("HTTP response code = " ^ (string_of_int r.XmlHttpRequest.code) ^ "\n\n" ^ r.XmlHttpRequest.content)
