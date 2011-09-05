@@ -1,4 +1,7 @@
 
-type t = (string, bool) Hashtbl.t
+type t = (string, bool) Hashtbl.t PGOCaml.t
 
-let h : t PGOCaml.t = Lwt_unix.run (PGOCaml.connect ())
+let pool : t Lwt_pool.t =
+	Lwt_pool.create 10 PGOCaml.connect
+
+let use (f : t -> 'a) : 'a = Lwt_pool.use pool f

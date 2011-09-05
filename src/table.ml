@@ -1,6 +1,4 @@
 
-open Db
-
 module Property = struct
 	type row = {
 		name : string;
@@ -15,19 +13,19 @@ module Property = struct
 		key, row
 
 	let select key =
-		PGSQL(h) "select name, name from property where name=$key"
+		Lwt_pool.use Db.pool (fun db -> PGSQL(db) "select name, name from property where name=$key")
 
 	let all () =
-		PGSQL(h) "select name, name from property"
+		Lwt_pool.use Db.pool (fun db -> PGSQL(db) "select name, name from property")
 
 	let insert t =
 		let name = t.name in
-		PGSQL(h) "insert into property (name) values ($name)"
+		Lwt_pool.use Db.pool (fun db -> PGSQL(db) "insert into property (name) values ($name)")
 
 	let update key t =
 		let name = t.name in
-		PGSQL(h) "update property set name=$name where name=$key"
+		Lwt_pool.use Db.pool (fun db -> PGSQL(db) "update property set name=$name where name=$key")
 
 	let delete key =
-		PGSQL(h) "delete from property where name=$key"
+		Lwt_pool.use Db.pool (fun db -> PGSQL(db) "delete from property where name=$key")
 end

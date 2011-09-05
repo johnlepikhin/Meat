@@ -10,6 +10,7 @@ module API = struct
 	let path_recipe_ingridients = ["api"; "recipe"; "ingridients"]
 	let path_login = ["api"; "login"]
 	let path_logout = ["api"; "logout"]
+	let path_seed = ["api"; "seed"]
 end
 
 module Login = struct
@@ -19,6 +20,7 @@ module Login = struct
 	let logout_id = string_id
 
 	let username_input_id = string_id
+	let password_input_id = string_id
 	let username_submit_id = string_id
 
 	let username_div_id = string_id

@@ -49,41 +49,19 @@ end
 
 let protocol_error e = Lwt.fail (Request e)
 
-let decode s =
-	let l = String.length s in
-	let b = Buffer.create l in
-	let rec loop pos =
-		if pos >= l then
-			()
-		else
-			match s.[pos] with
-				| '\\' ->
-					let h = String.sub s (pos+1) 2 in
-					let h = "0x" ^ h in
-					let c = int_of_string h in
-					let c = Char.chr c in
-					Buffer.add_char b c;
-					loop (pos+3)
-				| c ->
-					Buffer.add_char b c;
-					loop (pos+1)
-	in
-	loop 0;
-	Buffer.contents b
-
 let request ~args func =
 	lwt url = URL.make func [] in
 	lwt r = XmlHttpRequest.perform ~post_args:args url in
 	if (r.XmlHttpRequest.code = 200) then
 	begin
-		try
-			let r = decode r.XmlHttpRequest.content in
-			let r = Marshal.from_string r 0 in
-			match r with
-				| API.Data v -> Lwt.return v
-				| API.Error s -> protocol_error s
-		with
-			| _ -> protocol_error "Получены некорректные данные от сервера"
+		let r = API.of_string r.XmlHttpRequest.content in
+		match r with
+			| None ->
+				protocol_error "Получены некорректные данные от сервера"
+			| Some (API.Data v) ->
+				Lwt.return v
+			| Some (API.Error s) ->
+				protocol_error s
 	end
 	else
 		protocol_error ("HTTP response code = " ^ (string_of_int r.XmlHttpRequest.code) ^ "\n\n" ^ r.XmlHttpRequest.content)

@@ -9,7 +9,11 @@ module ShowIngridients = struct
 
 		type returns = unit Lwt.t
 
+		type real_returns = unit Lwt.t
+
 		let make_args msg = [| Js.Unsafe.inject msg |]
+
+		let make_ret _ = Lwt.return ()
 
 		let f name =
 			let call name =
@@ -20,7 +24,7 @@ module ShowIngridients = struct
 			Js_common.wrap_error call name
 	end
 
-	module M = Js_fun.F(F)
+	module M = Js_fun.NewFUN(F)
 
 	let show = M.call
 end

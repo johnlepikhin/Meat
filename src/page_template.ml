@@ -8,6 +8,7 @@ module LoginBlock = struct
 			<div class=$Cs.main_div$>
 				<div class=$Cs.login_container_div$ id=$C.login_container_id$>
 					<input type="string" name="username" class=$Cs.username_input$ id=$C.username_input_id$/>
+					<input type="password" name="password" class=$Cs.password_input$ id=$C.password_input_id$/>
 					<input type="button" class=$Cs.username_submit$ id=$C.username_submit_id$/>
 				</div>
 				<div class=$Cs.logout_container_div$ id=$C.logout_container_id$>
@@ -32,7 +33,7 @@ let escape s =
 	Buffer.contents r
 
 let init_js ~sp page_name =
-	lwt username = Eliom_sessions.get_persistent_session_data ~table:Session.s ~sp () in
+	lwt username = Eliom_sessions.get_persistent_session_data ~table:Session.user ~sp () in
 	let username = match username with
 		| Eliom_sessions.No_data
 		| Eliom_sessions.Data_session_expired -> None
@@ -56,6 +57,7 @@ let main ~sp ~js ~page_name content =
 		<html>
 			<head>
 				<title>Просто со вкусом</title>
+				<script type="text/javascript" src="/js/sha.js"/>
 				<script type="text/javascript" src=$js$/>
 				<link rel="stylesheet" type="text/css" href="/css/css_main.css"/>
 			</head>

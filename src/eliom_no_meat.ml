@@ -21,8 +21,13 @@ module API = struct
 			lwt r = f sp post in
 			Lwt.return (r, content_type)
 		in
+		let error_handler sp _ =
+			lwt r = Pg_API.wrong_parameters sp () in
+			Lwt.return (r, content_type)
+		in
 		Text.register
 			~service
+			~error_handler
 			~charset:"x-user-defined"
 			f
 
@@ -34,4 +39,5 @@ module API = struct
 	let _ = register S.recipe_ingridients P.recipe_ingridients
 	let _ = register S.login P.login
 	let _ = register S.logout P.logout
+	let _ = register S.seed P.seed
 end

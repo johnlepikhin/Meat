@@ -2,6 +2,8 @@
 open Css
 open Selector
 
+let border width color = "border", ((string_of_int width) ^ "px solid " ^ color)
+
 module Main = struct
 	module Head = struct
 		let div = make (Id int_id) []
@@ -15,6 +17,7 @@ module Main = struct
 		let login_container_div = make (Id int_id) []
 
 		let username_input = make (Id int_id) []
+		let password_input = make (Id int_id) []
 		let username_div = make (Id int_id) []
 		let username_submit = make (Id int_id) []
 
@@ -45,7 +48,7 @@ module Search = struct
 		]
 
 		let container_div = make (Id int_id) [
-			"border", "10px solid #d0d0d0";
+			border 10 "#d0d0d0";
 		]
 
 		let table = make (Id int_id) [
@@ -58,19 +61,19 @@ module Search = struct
 
 		module Ingridients = struct
 			let input = make (Id int_id) [
-				"border", "1px solid #d0d0d0";
+				border 1 "#d0d0d0";
 				"font-size", "1.5em";
 				"width", "100%";
 			]
 
 			module Autocomplete = struct
 				let container_div_empty = make (Id int_id) [
-					"border", "1px solid #d0d0d0";
+					border 1 "#d0d0d0";
 					"display", "none";
 				]
 
 				let container_div_full = make (Id int_id) [
-					"border", "1px solid #d0d0d0";
+					border 1 "#d0d0d0";
 					"display", "block";
 					"width", "100%";
 				]
@@ -93,41 +96,41 @@ module Search = struct
 
 		module Selection = struct
 			let container_div_empty = make (Id int_id) [
-				"border", "1px solid #d0d0d0";
+				border 1 "#d0d0d0";
 				"display", "none";
 			]
 
 			let container_div_full = make (Id int_id) [
-				"border", "1px solid #d0d0d0";
+				border 1 "#d0d0d0";
 				"display", "block";
 			]
 
 			let element_div = make (Id int_id) [
-				"border", "1px solid green";
+				border 1 "green";
 			]
 	
 			let delete_div = make (Id int_id) [
-				"border", "1px solid red";
+				border 1 "red";
 				"float", "left";
 				"width", "20px";
 				"cursor", "pointer";
 			]
 	
 			let content_div = make (Id int_id) [
-				"border", "1px solid green";
+				border 1 "green";
 			]
 		end
 	end
 
 	module Results = struct
 		let container_div = make (Id int_id) [
-			"border", "1px solid #d0d0d0";
+			border 1 "#d0d0d0";
 			"margin-top", "30px";
 			"margin-bottom", "30px";
 		]
 
 		let element_div = make (Id int_id) [
-			"border", "1px solid #d0d0d0";
+			border 1 "#d0d0d0";
 		]
 
 		let name_div = make (Id int_id) [

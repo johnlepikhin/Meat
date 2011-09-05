@@ -1,17 +1,15 @@
 
-open Db
-
 let limit = 20L
 
 let search_all ~offset =
-	PGSQL(h) "select recipe.name, recipe.ingridient_count
+	Db.use (fun db -> PGSQL(db) "select recipe.name, recipe.ingridient_count
 		from recipe
 		limit $limit
-		offset $offset"
+		offset $offset")
 
 let search_properties ~properties ~offset =
 	let property_length = Int64.of_int (List.length properties) in
-	PGSQL(h) "select recipe.name, recipe.ingridient_count
+	Db.use (fun db -> PGSQL(db) "select recipe.name, recipe.ingridient_count
 		from recipe
 		left join recipe_property on recipe.id=recipe_property.recipe
 		left join property on property.id=recipe_property.property
@@ -20,10 +18,10 @@ let search_properties ~properties ~offset =
 		having count(distinct property.id)=$property_length
 		order by recipe.name
 		limit $limit
-		offset $offset"
+		offset $offset")
 
 let search_ingridients ~ingridients ~offset =
-	PGSQL(h) "select recipe.name, recipe.ingridient_count
+	Db.use (fun db -> PGSQL(db) "select recipe.name, recipe.ingridient_count
 		from ingridient
 		left join recipe on recipe.id=ingridient.orig_id
 		left join recipe as ing on ing.id=ingridient.orig_id
@@ -32,11 +30,11 @@ let search_ingridients ~ingridients ~offset =
 		group by recipe.name, recipe.ingridient_count
 		order by count(*) desc
 		limit $limit
-		offset $offset"
+		offset $offset")
 
 let search_i_p ~ingridients ~properties ~offset =
 	let property_length = Int64.of_int (List.length properties) in
-	PGSQL(h) "select recipe.name, recipe.ingridient_count
+	Db.use (fun db -> PGSQL(db) "select recipe.name, recipe.ingridient_count
 		from ingridient
 		left join recipe on recipe.id=ingridient.orig_id
 		left join recipe_property on recipe.id=recipe_property.recipe
@@ -48,7 +46,7 @@ let search_i_p ~ingridients ~properties ~offset =
 		having count(distinct property.id)=$property_length
 		order by count(*) desc
 		limit $limit
-		offset $offset"
+		offset $offset")
 
 let search ~properties ~ingridients =
 	match properties, ingridients with

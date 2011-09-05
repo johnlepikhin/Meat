@@ -1,22 +1,20 @@
 
-open Db
-
 let get name =
-	PGSQL(h) "select recipe.id, recipe.name, recipe.ingridient_count
+	Db.use (fun db -> PGSQL(db) "select recipe.id, recipe.name, recipe.ingridient_count
 		from recipe
-		where recipe.name=$name"
+		where recipe.name=$name")
 
 let get_ingridients id =
-	PGSQL(h) "select recipe.name
+	Db.use (fun db -> PGSQL(db) "select recipe.name
 		from ingridient
 		left join recipe on recipe.id=ingridient.ref_id
-		where ingridient.orig_id=$id"
+		where ingridient.orig_id=$id")
 
 let get_parts id =
-	PGSQL(h) "select recipe_parts.text
+	Db.use (fun db -> PGSQL(db) "select recipe_parts.text
 		from recipe_parts
 		where recipe_parts.recipe=$id
-		order by recipe_parts.id"
+		order by recipe_parts.id")
 
 let f sp name () =
 	lwt r = get name in

@@ -248,70 +248,6 @@ module Ingridients = struct
 
 end
 
-module Login = struct
-	let login_div = EID.init C.Login.login_container_id DH.CoerceTo.div
-	let logout_div = EID.init C.Login.logout_container_id DH.CoerceTo.div
-	let logout_button_div = EID.init C.Login.logout_id DH.CoerceTo.div
-	let username_input = EID.init C.Login.username_input_id DH.CoerceTo.input
-	let username_submit = EID.init C.Login.username_submit_id DH.CoerceTo.input
-	let username_div = EID.init C.Login.username_div_id DH.CoerceTo.div
-
-	let show_login () =
-		lwt login_div = login_div () in
-		login_div##style##display <- string "block";
-		lwt logout_div = logout_div () in
-
-		logout_div##style##display <- string "none";
-		Lwt.return ()
-
-	let show_logout uname =
-		lwt login_div = login_div () in
-		login_div##style##display <- string "none";
-
-		lwt logout_div = logout_div () in
-		lwt username_div = username_div () in
-		logout_div##style##display <- string "block";
-		username_div##innerHTML <- string uname;
-		Lwt.return ()
-
-	let do_login _ =
-		lwt username_input = username_input () in
-		let username = to_string (username_input##value) in
-		lwt r = Js_API.request ~args:["username", username] C.API.path_login in
-		match r with
-			| API.Login.Ok username ->
-				show_logout username
-			| API.Login.Error s -> 
-				alert s;
-				Lwt.return ()
-
-	let do_logout _ =
-		lwt r = Js_API.request ~args:[] C.API.path_logout in
-		match r with
-			| API.Action.Ok -> show_login ()
-			| API.Action.Error s ->
-				alert s;
-				Lwt.return ()
-
-	let do_kb_login e =
-		if e##keyCode = 13 then
-			do_login ()
-		else
-			Lwt.return ()
-
-	let init () =
-		let username_var = Js_fun.var C.Login.username_var in
-		lwt username_submit = username_submit () in
-		lwt username_input = username_input () in
-		username_submit##onmouseup <- handler do_login _true;
-		username_input##onkeypress <- handler do_kb_login _true;
-		lwt logout_button_div = logout_button_div () in
-		logout_button_div##onmouseup <- handler do_logout _true;
-		match username_var with
-			| None -> show_login ()
-			| Some username -> show_logout username
-end
-
 module PageMain = struct
 	let init () =
 		ignore (Ingridients.init ())
@@ -329,7 +265,7 @@ end
 
 let init _ =
 	ignore (Js_UI.KeyEvent.init ());
-	ignore (Login.init ());
+	ignore (Js_login.init ());
 	let page_name = Js_fun.string C.page_name_var in
 	let _ = match page_name with
 		| Some v when v = C.PageName.main -> PageMain.init ()
