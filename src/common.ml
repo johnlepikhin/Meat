@@ -25,7 +25,7 @@ module Login = struct
 
 	let username_div_id = string_id
 
-	let username_var = js_prefix ^ string_id
+	let userinfo_var = js_prefix ^ string_id
 end
 
 module Search = struct
@@ -43,6 +43,10 @@ end
 
 module Results = struct
 	let show_ingridients_f = js_prefix ^ string_id
+
+	let element_div_prefix = js_prefix ^ string_id ^ "_"
+
+	let element_delete_div_prefix = js_prefix ^ string_id ^ "_"
 end
 
 module Recipe = struct

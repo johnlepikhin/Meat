@@ -26,25 +26,27 @@ let escape s =
 		match s.[i] with
 			| '\\' -> Buffer.add_string r "\\\\"
 			| '\'' -> Buffer.add_string r "\\'"
-			| '\n' -> Buffer.add_string r "\\n"
-			| '\r' -> Buffer.add_string r "\\r"
-			| c -> Buffer.add_char r c
+			| c ->
+				let cc = Char.code c in
+				if cc < 32 || cc > 127 then
+					Buffer.add_string r (Printf.sprintf "\\x%02x" cc)
+				else
+					Buffer.add_char r c
 	done;
 	Buffer.contents r
 
 let init_js ~sp page_name =
-	lwt username = Eliom_sessions.get_persistent_session_data ~table:Session.user ~sp () in
-	let username = match username with
+	lwt info = Eliom_sessions.get_persistent_session_data ~table:Session.User.user ~sp () in
+	let info = match info with
 		| Eliom_sessions.No_data
 		| Eliom_sessions.Data_session_expired -> None
-		| Eliom_sessions.Data s -> Some s
+		| Eliom_sessions.Data info -> Some info.Session.User.info
 	in
-	let vars = match username with
-		| None -> []
-		| Some username -> [ Common.Login.username_var, username ]
-	in
-	let vars = (Common.page_name_var, page_name) :: vars in
-	let vars = List.map (fun (n,v) -> n^"='" ^ (escape v)^ "';") vars in
+	let vars = [
+		Common.page_name_var, page_name;
+		Common.Login.userinfo_var, API.to_string info;
+	] in
+	let vars = List.map (fun (n,v) -> n ^"='" ^ (escape v) ^ "';") vars in
 	let script = String.concat "" vars in
 	let script = XHTML.M.cdata_script script in
 	Lwt.return <<

@@ -266,7 +266,7 @@ end
 let init _ =
 	ignore (Js_UI.KeyEvent.init ());
 	ignore (Js_login.init ());
-	let page_name = Js_fun.string C.page_name_var in
+	let page_name = Js_fun.string_opt C.page_name_var in
 	let _ = match page_name with
 		| Some v when v = C.PageName.main -> PageMain.init ()
 		| Some v when v = C.PageName.search_results -> PageSearchResults.init ()

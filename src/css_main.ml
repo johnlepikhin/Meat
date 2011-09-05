@@ -133,6 +133,13 @@ module Search = struct
 			border 1 "#d0d0d0";
 		]
 
+		let elevent_div_hover = make (Id int_id) [
+			border 1 "#d0d0d0";
+			"background", "#9090ff";
+		]
+
+		let delete_div = make (Id int_id) []
+
 		let name_div = make (Id int_id) [
 			"float", "left";
 			"width", "30%";

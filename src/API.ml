@@ -18,8 +18,15 @@ module Seed = struct
 end
 
 module Login = struct
+	type info = {
+		username : string;
+		first_name : string;
+		last_name : string option;
+		person : string;
+	}
+
 	type t =
-		| Ok of string
+		| Ok of info
 		| Error
 end
 

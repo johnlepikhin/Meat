@@ -49,18 +49,28 @@ let seed sp () =
 let login sp (username, hash) =
 	let seed = get_seed sp in
 	Eliom_sessions.remove_volatile_session_data ~sp ~table:Session.seed ();
-	lwt row = Db.use (fun db -> PGSQL(db) "select id, firstname, lastname, password
+	lwt row = Db.use (fun db -> PGSQL(db) "select id, username, firstname, lastname, password
 		from users
 		where username=$username")
 	in
 	lwt r = match row with
-		| [id, firstname, lastname, password] when hash = Ml_password.encrypt_seed_hash ~seed password ->
+		| [id, username, firstname, lastname, password] when hash = Ml_password.encrypt_seed_hash ~seed password ->
 			let person = match lastname with
 				| Some l -> firstname ^ " " ^ l
 				| None -> firstname
 			in
-			lwt _ = Eliom_sessions.set_persistent_session_data ~table:Session.user ~sp person in
-			Lwt.return (API.Login.Ok person)
+			let info = {
+				API.Login.username = username;
+				API.Login.first_name = firstname;
+				API.Login.last_name = lastname;
+				API.Login.person = person;
+			} in
+			let t = {
+				Session.User.id = id;
+				Session.User.info = info;
+			} in
+			lwt _ = Eliom_sessions.set_persistent_session_data ~table:Session.User.user ~sp t in
+			Lwt.return (API.Login.Ok info)
 		| _ ->
 			lwt _ = Lwt_unix.sleep (Random.float 3.) in
 			Lwt.return API.Login.Error
@@ -68,7 +78,7 @@ let login sp (username, hash) =
 	ok r
 
 let logout sp () =
-	lwt _ = Eliom_sessions.remove_persistent_session_data ~sp ~table:Session.user () in
+	lwt _ = Eliom_sessions.remove_persistent_session_data ~sp ~table:Session.User.user () in
 (*
 	lwt _ = Eliom_sessions.close_session ~sp () in
 *)

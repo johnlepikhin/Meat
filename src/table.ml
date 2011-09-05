@@ -13,19 +13,19 @@ module Property = struct
 		key, row
 
 	let select key =
-		Lwt_pool.use Db.pool (fun db -> PGSQL(db) "select name, name from property where name=$key")
+		Db.use (fun db -> PGSQL(db) "select name, name from property where name=$key")
 
 	let all () =
-		Lwt_pool.use Db.pool (fun db -> PGSQL(db) "select name, name from property")
+		Db.use (fun db -> PGSQL(db) "select name, name from property")
 
 	let insert t =
 		let name = t.name in
-		Lwt_pool.use Db.pool (fun db -> PGSQL(db) "insert into property (name) values ($name)")
+		Db.use (fun db -> PGSQL(db) "insert into property (name) values ($name)")
 
 	let update key t =
 		let name = t.name in
-		Lwt_pool.use Db.pool (fun db -> PGSQL(db) "update property set name=$name where name=$key")
+		Db.use (fun db -> PGSQL(db) "update property set name=$name where name=$key")
 
 	let delete key =
-		Lwt_pool.use Db.pool (fun db -> PGSQL(db) "delete from property where name=$key")
+		Db.use (fun db -> PGSQL(db) "delete from property where name=$key")
 end

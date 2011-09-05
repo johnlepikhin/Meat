@@ -6,6 +6,9 @@ open Js_UI
 module DH = Dom_html
 module C = Common
 
+let on_login = ref []
+let on_logout = ref []
+
 let login_div = EID.init C.Login.login_container_id DH.CoerceTo.div
 let logout_div = EID.init C.Login.logout_container_id DH.CoerceTo.div
 let logout_button_div = EID.init C.Login.logout_id DH.CoerceTo.div
@@ -14,22 +17,39 @@ let password_input = EID.init C.Login.password_input_id DH.CoerceTo.input
 let username_submit = EID.init C.Login.username_submit_id DH.CoerceTo.input
 let username_div = EID.init C.Login.username_div_id DH.CoerceTo.div
 
-let show_login () =
+let get_userinfo () =
+	lwt userinfo_var = Js_fun.string C.Login.userinfo_var in
+	let r : API.Login.info option option = API.of_string userinfo_var in
+	let r = match r with
+			| None -> None
+			| Some v -> v
+	in
+	Lwt.return r
+
+let set_userinfo (info : API.Login.info option) =
+	let info = API.to_string info in
+	Js_fun.set_string C.Login.userinfo_var info
+
+let logged_out () =
 	lwt login_div = login_div () in
 	login_div##style##display <- string "block";
 	lwt logout_div = logout_div () in
 
 	logout_div##style##display <- string "none";
+	List.iter (fun f -> f ()) !on_logout;
+	set_userinfo None;
 	Lwt.return ()
 
-let show_logout uname =
+let logged_in info =
 	lwt login_div = login_div () in
 	login_div##style##display <- string "none";
 
 	lwt logout_div = logout_div () in
 	lwt username_div = username_div () in
 	logout_div##style##display <- string "block";
-	username_div##innerHTML <- string uname;
+	username_div##innerHTML <- string info.API.Login.person;
+	List.iter (fun f -> f info) !on_login;
+	set_userinfo (Some info);
 	Lwt.return ()
 
 let do_login user password =
@@ -41,8 +61,8 @@ let do_login user password =
 	] in
 	lwt r = Js_API.request ~args C.API.path_login in
 	match r with
-		| API.Login.Ok username ->
-			show_logout username
+		| API.Login.Ok info ->
+			logged_in info
 		| API.Login.Error -> 
 			alert "Не правильное имя пользователя или пароль.";
 			Lwt.return ()
@@ -92,7 +112,8 @@ let login_pressed _ =
 let do_logout _ =
 	lwt r = Js_API.request ~args:[] C.API.path_logout in
 	match r with
-		| API.Action.Ok -> show_login ()
+		| API.Action.Ok ->
+			logged_out ()
 		| API.Action.Error s ->
 			alert s;
 			Lwt.return ()
@@ -103,8 +124,26 @@ let do_kb_login e =
 	else
 		Lwt.return ()
 
+let is_authenticated () =
+	lwt info = get_userinfo () in
+	match info with
+		| None -> Lwt.return false
+		| Some _ -> Lwt.return true
+
+let add_on_login f =
+	on_login := f :: !on_login
+
+let add_on_logout f =
+	on_logout := f :: !on_logout
+
+let if_authenticated f =
+	lwt have_auth = is_authenticated () in
+	if have_auth then
+		f ()
+	else
+		Lwt.return ()
+
 let init () =
-	let username_var = Js_fun.var C.Login.username_var in
 	lwt username_submit = username_submit () in
 	lwt username_input = username_input () in
 	lwt password_input = password_input () in
@@ -113,6 +152,7 @@ let init () =
 	password_input##onkeypress <- handler do_kb_login _true;
 	lwt logout_button_div = logout_button_div () in
 	logout_button_div##onmouseup <- handler do_logout _true;
-	match username_var with
-		| None -> show_login ()
-		| Some username -> show_logout username
+	lwt info = get_userinfo () in
+	match info with
+		| None -> logged_out ()
+		| Some info -> logged_in info
