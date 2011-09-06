@@ -129,6 +129,7 @@ module Search = struct
 			"margin-bottom", "30px";
 			"width", "100%";
 			"border-collapse", "collapse";
+			"border-spacing", "0px";
 		]
 
 		let element_tr = make (Id int_id) []
@@ -138,18 +139,23 @@ module Search = struct
 		]
 
 		let delete_td = make (Id int_id) [
-			"width", "1px";
+			"padding", "0px";
+			"width", "2em";
 		]
 
 		let delete_div = make (Id int_id) [
 			"display", "none";
+			"cursor", "pointer";
 		]
 
 		let name_td = make (Id int_id) [
+			"padding", "0px";
 			"width", "30%";
 		]
 
-		let info_td = make (Id int_id) []
+		let info_td = make (Id int_id) [
+			"padding", "0px";
+		]
 	end
 end
 

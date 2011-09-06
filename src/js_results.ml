@@ -29,36 +29,6 @@ module ShowIngridients = struct
 end
 *)
 
-module RecipesList = struct
-(*
-	module OnMouseOver = Js_fun.NewACTION(struct
-		let name = Common.Results.onmouseover_f
-
-		type input = DH.divElement Js.t
-
-		let make_args div = [| Js.Unsafe.inject div |]
-
-		let f div = Js_login.if_authenticated (fun _ ->
-			div##className <- string CS.elevent_div_hover;
-			Lwt.return ()
-		)
-	end)
-
-	module OnMouseOut = Js_fun.NewACTION(struct
-		let name = Common.Results.onmouseout_f
-
-		type input = DH.divElement Js.t
-
-		let make_args div = [| Js.Unsafe.inject div |]
-
-		let f div = Js_login.if_authenticated (fun _ ->
-			div##className <- string CS.element_div;
-			Lwt.return ()
-		)
-	end)
-*)
-end
-
 module LstVar = Js_var.GlobalMlVar(struct
 	type t = API.SearchResults.ids_list
 
