@@ -17,19 +17,6 @@ let password_input = EID.init C.Login.password_input_id DH.CoerceTo.input
 let username_submit = EID.init C.Login.username_submit_id DH.CoerceTo.input
 let username_div = EID.init C.Login.username_div_id DH.CoerceTo.div
 
-let get_userinfo () =
-	lwt userinfo_var = Js_fun.string C.Login.userinfo_var in
-	let r : API.Login.info option option = API.of_string userinfo_var in
-	let r = match r with
-			| None -> None
-			| Some v -> v
-	in
-	Lwt.return r
-
-let set_userinfo (info : API.Login.info option) =
-	let info = API.to_string info in
-	Js_fun.set_string C.Login.userinfo_var info
-
 let logged_out () =
 	lwt login_div = login_div () in
 	login_div##style##display <- string "block";
@@ -37,7 +24,7 @@ let logged_out () =
 
 	logout_div##style##display <- string "none";
 	List.iter (fun f -> f ()) !on_logout;
-	set_userinfo None;
+	Js_mlvar.UserInfo.set None;
 	Lwt.return ()
 
 let logged_in info =
@@ -49,7 +36,7 @@ let logged_in info =
 	logout_div##style##display <- string "block";
 	username_div##innerHTML <- string info.API.Login.person;
 	List.iter (fun f -> f info) !on_login;
-	set_userinfo (Some info);
+	Js_mlvar.UserInfo.set (Some info);
 	Lwt.return ()
 
 let do_login user password =
@@ -125,7 +112,7 @@ let do_kb_login e =
 		Lwt.return ()
 
 let is_authenticated () =
-	lwt info = get_userinfo () in
+	lwt info = Js_mlvar.UserInfo.get () in
 	match info with
 		| None -> Lwt.return false
 		| Some _ -> Lwt.return true
@@ -152,7 +139,7 @@ let init () =
 	password_input##onkeypress <- handler do_kb_login _true;
 	lwt logout_button_div = logout_button_div () in
 	logout_button_div##onmouseup <- handler do_logout _true;
-	lwt info = get_userinfo () in
+	lwt info = Js_mlvar.UserInfo.get () in
 	match info with
 		| None -> logged_out ()
 		| Some info -> logged_in info

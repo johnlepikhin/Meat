@@ -26,8 +26,10 @@ let of_nlist f lst =
 let of_parts = of_nlist of_part
 let of_ingridients = of_nlist of_ingridient
 
+let tpl sp = Page_template.main ~js:"/js/js_search.js" ~sp ~page_type:API.Page.ShowRecipe
+
 let f ~ingridients_count ~ingridients ~parts ~sp name =
-	Page_template.main ~js:"/js/js_search.js" ~sp ~page_name:Common.PageName.show_recipe <<
+	tpl sp <<
 		<div class=$Css_main.Main.Content.container_div$>
 			<div class=$CR.name_div$>
 				$str:name$
@@ -42,7 +44,7 @@ let f ~ingridients_count ~ingridients ~parts ~sp name =
 	>>
 
 let not_found ~sp name =
-	Page_template.main ~js:"/js/js_search.js" ~sp ~page_name:Common.PageName.show_recipe <<
+	tpl sp <<
 		<div class=$Css_main.Main.Content.container_div$>
 			Рецепт $str:name$ у нас еще не описан.
 		</div>

@@ -1,4 +1,11 @@
 
+module Page = struct
+	type t =
+		| Main
+		| SearchResults
+		| ShowRecipe
+end
+
 module Action = struct
 	type t =
 		| Ok

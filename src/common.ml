@@ -54,11 +54,3 @@ module Recipe = struct
 
 	let param_name = "q"
 end
-
-module PageName = struct
-	let main = string_id
-
-	let search_results = string_id
-
-	let show_recipe = string_id
-end

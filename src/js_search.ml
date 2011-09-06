@@ -266,12 +266,11 @@ end
 let init _ =
 	ignore (Js_UI.KeyEvent.init ());
 	ignore (Js_login.init ());
-	let page_name = Js_fun.string_opt C.page_name_var in
-	let _ = match page_name with
-		| Some v when v = C.PageName.main -> PageMain.init ()
-		| Some v when v = C.PageName.search_results -> PageSearchResults.init ()
-		| Some v when v = C.PageName.show_recipe -> PageShowRecipe.init ()
-		| _ -> ()
+	lwt page_type = Js_mlvar.Page.get () in
+	let _ = match page_type with
+		| API.Page.Main -> PageMain.init ()
+		| API.Page.SearchResults -> PageSearchResults.init ()
+		| API.Page.ShowRecipe -> PageShowRecipe.init ()
 	in
 	Lwt.return ()
 
