@@ -16,12 +16,12 @@ let get_parts id =
 		where recipe_parts.recipe=$id
 		order by recipe_parts.id")
 
-let f sp name () =
-	lwt r = get name in
+let f req =
+	lwt r = get (Processor.Page.get req) in
 	match r with
 		| [(id, name, ingridients_count)] ->
 			lwt ingridients = get_ingridients id in
 			lwt parts = get_parts id in
-			D_show_recipe.f ~ingridients_count ~ingridients ~parts ~sp name
+			D_show_recipe.f ~ingridients_count ~ingridients ~parts req
 		| _ ->
-			D_show_recipe.not_found ~sp name
+			D_show_recipe.not_found req

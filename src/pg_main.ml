@@ -1,3 +1,3 @@
 
-let f sp () () =
-	D_main.main ~sp ([], [])
+let f req =
+	D_main.main req

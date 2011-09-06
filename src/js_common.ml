@@ -52,8 +52,8 @@ let wrap_error f arg =
 	try_lwt
 		f arg
 	with
+		| Exit -> Lwt.fail Exit
 		| e ->
-		begin
 			let error = match e with
 				| EID.NotFound s -> "Не найден элемент с ID='" ^ s ^ "'"
 				| EID.CantCoerce s -> "Не получилось преобразовать тип для элемента с ID='" ^ s ^ "'"
@@ -62,7 +62,6 @@ let wrap_error f arg =
 				| e -> Printexc.to_string e
 			in
 			fatal error
-		end
 
 let eignore f arg =
 	ignore (wrap_error f arg)

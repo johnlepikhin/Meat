@@ -35,17 +35,15 @@ let escape s =
 	done;
 	Buffer.contents r
 
-let init_js ~sp ~js_vars page_type =
-	lwt info = Eliom_sessions.get_persistent_session_data ~table:Session.User.user ~sp () in
-	let info = match info with
-		| Eliom_sessions.No_data
-		| Eliom_sessions.Data_session_expired -> None
-		| Eliom_sessions.Data info -> Some info.Session.User.info
+let init_js req =
+	let ui = match Processor.Page.userinfo req with
+		| None -> None
+		| Some u -> Some u.Session.User.info
 	in
 	let vars = [
-		Common.page_name_var, API.to_string page_type;
-		Common.Login.userinfo_var, API.to_string info;
-	] @ js_vars in
+		Common.page_name_var, API.to_string req.T_processor.Page.page_type;
+		Common.Login.userinfo_var, API.to_string ui;
+	] @ req.T_processor.Page.js_vars in
 	let vars = List.map (fun (n,v) -> n ^"='" ^ (escape v) ^ "';") vars in
 	let script = String.concat "" vars in
 	let script = XHTML.M.cdata_script script in
@@ -53,15 +51,22 @@ let init_js ~sp ~js_vars page_type =
 		<script type="text/javascript">$script$</script>
 	>>
 
-let main ~sp ~js ~page_type ?(js_vars=[]) content =
-	lwt init_js = init_js ~sp ~js_vars page_type in
+let main req content =
+	lwt init_js = init_js req in
+	let js_scripts = match req.T_processor.Page.js_scripts with
+		| None -> [
+				<< <script type="text/javascript" src="/js/sha.js"/> >>;
+				<< <script type="text/javascript" src="/js/js_main.js"/> >>;
+			]
+		| Some lst ->
+			mapl lst (<< <script type="text/javascript" src=$__$/> >>)
+	in
 	Lwt.return <<
 		<html>
 			<head>
 				<title>Просто со вкусом</title>
-				<script type="text/javascript" src="/js/sha.js"/>
-				<script type="text/javascript" src=$js$/>
 				<link rel="stylesheet" type="text/css" href="/css/css_main.css"/>
+				$list:js_scripts$
 			</head>
 			<body id=$Common.body_id$>
 				$init_js$

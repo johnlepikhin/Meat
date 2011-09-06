@@ -25,9 +25,9 @@ let prop_list ~properties_field p_props =
 	) in
 	Lwt.return r
 
-let search_form ~sp ~p_props =
+let search_form ~selected_ingridients ~selected_properties req =
 	let generator (_, properties_field) =
-		lwt prop_list = prop_list ~properties_field p_props in
+		lwt prop_list = prop_list ~properties_field selected_ingridients in
 		Lwt.return <:xmllist<
 			<div class=$CF.container_div$>
 				<div class=$CF.form_div$>
@@ -54,6 +54,6 @@ let search_form ~sp ~p_props =
 	in
 	lwt_get_form
 		~a:[a_id FS.form_id]
-		~sp
+		~sp:(Processor.Page.sp req)
  		~service:Services.search_results
 		generator

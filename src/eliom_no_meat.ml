@@ -1,14 +1,14 @@
 
 open Eliom_predefmod
 
-let xhtml service f =
-	Xhtmlcompact.register ~service f
+let xhtml ~service ~page_type f =
+	Xhtmlcompact.register ~service (Processor.Page.call ~f ~page_type)
 
-let main = xhtml Services.main Pg_main.f
+let main = xhtml ~service:Services.main ~page_type:API.Page.Main Pg_main.f
 
-let search_results = xhtml Services.search_results Pg_search_results.f
+let search_results = xhtml ~service:Services.search_results ~page_type:API.Page.SearchResults Pg_search_results.f
 
-let show_recipe = xhtml Services.show_recipe Pg_show_recipe.f
+let show_recipe = xhtml ~service:Services.show_recipe ~page_type:API.Page.ShowRecipe Pg_show_recipe.f
 
 module API = struct
 	module S = Services.API
@@ -18,7 +18,7 @@ module API = struct
 
 	let make service f =
 		let f sp get post =
-			lwt r = f sp post in
+			lwt r = Processor.Common.call ~f sp () post in
 			Lwt.return (r, content_type)
 		in
 		let error_handler sp _ =

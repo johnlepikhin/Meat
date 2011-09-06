@@ -59,8 +59,8 @@ let split =
 	let rex = Pcre.regexp "\\s*,\\s*" in
 	Pcre.split ~rex
 
-let f sp params () =
-	let (ingridients, properties) = params in
-	let search_f = search ~properties ~ingridients:ingridients in
+let f req =
+	let (selected_ingridients, selected_properties) = Processor.Page.get req in
+	let search_f = search ~properties:selected_properties ~ingridients:selected_ingridients in
 	lwt results = search_f ~offset:0L in
-	D_search_results.main ~sp params results
+	D_search_results.main req results

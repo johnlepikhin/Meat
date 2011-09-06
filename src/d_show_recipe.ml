@@ -26,13 +26,11 @@ let of_nlist f lst =
 let of_parts = of_nlist of_part
 let of_ingridients = of_nlist of_ingridient
 
-let tpl sp = Page_template.main ~js:"/js/js_search.js" ~sp ~page_type:API.Page.ShowRecipe
-
-let f ~ingridients_count ~ingridients ~parts ~sp name =
-	tpl sp <<
+let f ~ingridients_count ~ingridients ~parts req =
+	Page_template.main req <<
 		<div class=$Css_main.Main.Content.container_div$>
 			<div class=$CR.name_div$>
-				$str:name$
+				$str:(Processor.Page.get req)$
 			</div>
 			<ul class=$CR.Ingridients.container_ul$>
 				$list:of_ingridients ingridients$
@@ -43,9 +41,9 @@ let f ~ingridients_count ~ingridients ~parts ~sp name =
 		</div>
 	>>
 
-let not_found ~sp name =
-	tpl sp <<
+let not_found req =
+	Page_template.main req <<
 		<div class=$Css_main.Main.Content.container_div$>
-			Рецепт $str:name$ у нас еще не описан.
+			Рецепт $str:(Processor.Page.get req)$ у нас еще не описан.
 		</div>
 	>>

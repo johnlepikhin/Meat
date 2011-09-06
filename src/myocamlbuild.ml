@@ -9,7 +9,7 @@ let ocsigen_css_path = "ocsigen/css"
 let targets = [
 	("eliom_no_meat.cmxs", Some ocsigen_modules_path);
 	("ocsipersist.cmxs", Some ocsigen_modules_path);
-	("js_search.js", Some ocsigen_js_path);
+	("js_main.js", Some ocsigen_js_path);
 	("sha.js", Some ocsigen_js_path);
 	("css_main.css", Some ocsigen_css_path);
 ]

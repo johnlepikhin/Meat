@@ -7,3 +7,5 @@ let current_year =
 	string_of_int (time.Unix.tm_year + 1900)
 
 let copyright = "Эля Петрас и Евгений Лепихин"
+
+let default_title = "Просто со вкусом"
