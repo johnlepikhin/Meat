@@ -23,8 +23,8 @@ let logged_out () =
 	lwt logout_div = logout_div () in
 
 	logout_div##style##display <- string "none";
-	List.iter (fun f -> f ()) !on_logout;
 	Js_mlvar.UserInfo.set None;
+	List.iter (fun f -> f ()) !on_logout;
 	Lwt.return ()
 
 let logged_in info =
@@ -35,8 +35,8 @@ let logged_in info =
 	lwt username_div = username_div () in
 	logout_div##style##display <- string "block";
 	username_div##innerHTML <- string info.API.Login.person;
-	List.iter (fun f -> f info) !on_login;
 	Js_mlvar.UserInfo.set (Some info);
+	List.iter (fun f -> f info) !on_login;
 	Lwt.return ()
 
 let do_login user password =

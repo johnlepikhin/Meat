@@ -35,7 +35,7 @@ let escape s =
 	done;
 	Buffer.contents r
 
-let init_js ~sp page_type =
+let init_js ~sp ~js_vars page_type =
 	lwt info = Eliom_sessions.get_persistent_session_data ~table:Session.User.user ~sp () in
 	let info = match info with
 		| Eliom_sessions.No_data
@@ -45,7 +45,7 @@ let init_js ~sp page_type =
 	let vars = [
 		Common.page_name_var, API.to_string page_type;
 		Common.Login.userinfo_var, API.to_string info;
-	] in
+	] @ js_vars in
 	let vars = List.map (fun (n,v) -> n ^"='" ^ (escape v) ^ "';") vars in
 	let script = String.concat "" vars in
 	let script = XHTML.M.cdata_script script in
@@ -53,8 +53,8 @@ let init_js ~sp page_type =
 		<script type="text/javascript">$script$</script>
 	>>
 
-let main ~sp ~js ~page_type content =
-	lwt init_js = init_js ~sp page_type in
+let main ~sp ~js ~page_type ?(js_vars=[]) content =
+	lwt init_js = init_js ~sp ~js_vars page_type in
 	Lwt.return <<
 		<html>
 			<head>

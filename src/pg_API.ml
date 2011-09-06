@@ -79,7 +79,4 @@ let login sp (username, hash) =
 
 let logout sp () =
 	lwt _ = Eliom_sessions.remove_persistent_session_data ~sp ~table:Session.User.user () in
-(*
-	lwt _ = Eliom_sessions.close_session ~sp () in
-*)
 	ok API.Action.Ok

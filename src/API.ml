@@ -18,6 +18,8 @@ end
 
 module SearchResults = struct
 	type ingridients_list = string list
+
+	type ids_list = int list
 end
 
 module Seed = struct

@@ -18,30 +18,27 @@ module EID = struct
 	exception NotFound of string
 	exception CantCoerce of string
 
+	let get name coerce =
+		let e = doc##getElementById (string name) in
+		match Js.Opt.to_option e with
+			| None -> Lwt.fail (NotFound name)
+			| Some e ->
+				let e = coerce e in
+				match Js.Opt.to_option e with
+					| None -> Lwt.fail (CantCoerce name)
+					| Some e -> Lwt.return e
+
 	let init id coerce =
 		let v = {
 			id = id;
 			el = None;
 		} in
-		fun () ->
-			match v.el with
-				| None ->
-					let e = doc##getElementById (string v.id) in
-					begin
-						match Js.Opt.to_option e with
-							| None -> raise (NotFound v.id)
-							| Some e ->
-								begin
-									let e = coerce e in
-									match Js.Opt.to_option e with
-										| None -> Lwt.fail (CantCoerce id)
-										| Some e ->
-											v.el <- Some e;
-											Lwt.return e
-								end
-					end
-				| Some e ->
-					Lwt.return e
+		fun () -> match v.el with
+			| None ->
+				lwt nv = get v.id coerce in
+				v.el <- Some nv;
+				Lwt.return nv
+			| Some e -> Lwt.return e
 
 	let string_of_field f =
 		lwt f = f () in
@@ -67,7 +64,10 @@ let wrap_error f arg =
 			fatal error
 		end
 
-let handler f r = Dom_html.handler (fun v -> ignore (wrap_error f v); r)
+let eignore f arg =
+	ignore (wrap_error f arg)
+
+let handler f r = Dom_html.handler (fun v -> eignore f v; r)
 
 let removeChilds p =
 	let rec loop () =

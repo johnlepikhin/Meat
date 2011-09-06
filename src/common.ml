@@ -39,14 +39,16 @@ module Search = struct
 	let autocomplete_id = string_id
 	let selected_ingridients_list_id = string_id
 	let selected_ingridients_inputs_id = string_id
-end
 
-module Results = struct
-	let show_ingridients_f = js_prefix ^ string_id
+	module Results = struct
+(*		let show_ingridients_f = js_prefix ^ string_id *)
 
-	let element_div_prefix = js_prefix ^ string_id ^ "_"
+		let element_tr_prefix = js_prefix ^ string_id ^ "_"
 
-	let element_delete_div_prefix = js_prefix ^ string_id ^ "_"
+		let element_delete_div_prefix = js_prefix ^ string_id ^ "_"
+
+		let ids_list_var = js_prefix ^ string_id
+	end
 end
 
 module Recipe = struct

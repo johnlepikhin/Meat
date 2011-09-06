@@ -4,8 +4,6 @@ open Js_primitives
 open Js_common
 open Js_UI
 
-module Import1 = Js_results
-
 module DH = Dom_html
 module C = Common
 
@@ -73,7 +71,7 @@ module Ingridients = struct
 
 		let init () =
 			let lst = current () in
-			List.iter (fun name -> ignore (select ~name ())) lst;
+			List.iter (fun name -> eignore (select ~name) ()) lst;
 	end
 
 	module Autocomplete = struct
@@ -250,12 +248,13 @@ end
 
 module PageMain = struct
 	let init () =
-		ignore (Ingridients.init ())
+		eignore Ingridients.init ()
 end
 
 module PageSearchResults = struct
 	let init () =
-		ignore (Ingridients.init ())
+		eignore Ingridients.init ();
+		Js_results.ListEdit.init ()
 end
 
 module PageShowRecipe = struct
@@ -264,14 +263,14 @@ module PageShowRecipe = struct
 end
 
 let init _ =
-	ignore (Js_UI.KeyEvent.init ());
-	ignore (Js_login.init ());
 	lwt page_type = Js_mlvar.Page.get () in
 	let _ = match page_type with
 		| API.Page.Main -> PageMain.init ()
 		| API.Page.SearchResults -> PageSearchResults.init ()
 		| API.Page.ShowRecipe -> PageShowRecipe.init ()
 	in
+	eignore Js_UI.KeyEvent.init ();
+	eignore Js_login.init ();
 	Lwt.return ()
 
 let _ = window##onload <- handler init _true

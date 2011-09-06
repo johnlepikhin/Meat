@@ -123,30 +123,33 @@ module Search = struct
 	end
 
 	module Results = struct
-		let container_div = make (Id int_id) [
+		let container_table = make (Id int_id) [
 			border 1 "#d0d0d0";
 			"margin-top", "30px";
 			"margin-bottom", "30px";
+			"width", "100%";
+			"border-collapse", "collapse";
 		]
 
-		let element_div = make (Id int_id) [
-			border 1 "#d0d0d0";
-		]
+		let element_tr = make (Id int_id) []
 
-		let elevent_div_hover = make (Id int_id) [
-			border 1 "#d0d0d0";
+		let element_tr_hover = make (Id int_id) [
 			"background", "#9090ff";
 		]
 
-		let delete_div = make (Id int_id) []
+		let delete_td = make (Id int_id) [
+			"width", "1px";
+		]
 
-		let name_div = make (Id int_id) [
-			"float", "left";
+		let delete_div = make (Id int_id) [
+			"display", "none";
+		]
+
+		let name_td = make (Id int_id) [
 			"width", "30%";
 		]
 
-		let info_div = make (Id int_id) [
-		]
+		let info_td = make (Id int_id) []
 	end
 end
 
