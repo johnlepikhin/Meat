@@ -262,7 +262,11 @@ module PageShowRecipe = struct
 		()
 end
 
+let test () =
+	Js_TextArea.make ~controller:(ref "myval") "test"
+
 let init _ =
+	lwt _ = test () in
 	lwt page_type = Js_mlvar.Page.get () in
 	let _ = match page_type with
 		| API.Page.Main -> PageMain.init ()

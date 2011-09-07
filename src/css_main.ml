@@ -185,3 +185,13 @@ module Recipe = struct
 		
 	end
 end
+
+module Edit = struct
+	let textarea = make (Id int_id) [
+		"padding", "0px";
+		"margin", "0px";
+		border 1 "red";
+		"width", "100%";
+		"height", "40px";
+	]
+end
