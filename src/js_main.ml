@@ -263,7 +263,11 @@ module PageShowRecipe = struct
 end
 
 let test () =
-	Js_TextArea.make ~controller:(ref "myval") "test"
+	let style = {
+		Js_TextArea.M.s_textarea = "textarea";
+		Js_TextArea.M.s_container = "container";
+	} in
+	Js_TextArea.make ~style ~data:(ref "myval") "test"
 
 let init _ =
 	lwt _ = test () in

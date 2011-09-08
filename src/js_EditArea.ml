@@ -5,7 +5,9 @@ module DH = Dom_html
 module type EDITWIDGET = sig
 	type t
 
-	val init: DH.divElement Js.t -> Js.js_string Js.t -> t
+	type style
+
+	val init: style:style -> Js.js_string Js.t -> t
 
 	val get_value: t -> Js.js_string Js.t
 
@@ -16,17 +18,15 @@ module type EDITWIDGET = sig
 	val update_view: DH.divElement Js.t -> t -> unit
 end
 
-module type CONTROLLER = sig
+module type DATA = sig
 	type t
-
-	val can_edit: t -> bool Lwt.t
 
 	val set_value: t -> Js.js_string Js.t -> unit
 
 	val get_value: t -> Js.js_string Js.t
 end
 
-module F = functor(E : EDITWIDGET) -> functor(C : CONTROLLER) -> struct
+module F = functor(E : EDITWIDGET) -> functor(C : Js_controllers.TYPE) -> functor(D : DATA) -> struct
 	type mode =
 		| Edit
 		| View
@@ -34,7 +34,7 @@ module F = functor(E : EDITWIDGET) -> functor(C : CONTROLLER) -> struct
 	type t = {
 		div : DH.divElement Js.t;
 		edit_widget : E.t;
-		controller : C.t;
+		data : D.t;
 		mutable current_mode : mode;
 	}
 
@@ -57,13 +57,13 @@ module F = functor(E : EDITWIDGET) -> functor(C : CONTROLLER) -> struct
 				t.current_mode <- View;
 				E.update_view t.div t.edit_widget;
 				let newval = E.get_value t.edit_widget in
-				C.set_value t.controller newval;
+				D.set_value t.data newval;
 				Lwt.return ()
 			| View ->
 				Lwt.return ()
 
 	let onmouseover t _ = 
-		lwt can_edit = C.can_edit t.controller in
+		lwt can_edit = C.can_edit () in
 		if can_edit then
 			set_edit_mode t
 		else
@@ -72,14 +72,14 @@ module F = functor(E : EDITWIDGET) -> functor(C : CONTROLLER) -> struct
 	let onmouseout t _ =
 		set_view_mode t
 
-	let make ~controller id =
+	let make ~data ~style id =
 		lwt div = (Js_common.EID.init id Dom_html.CoerceTo.div) () in
-		let initial_value = C.get_value controller in
-		let edit_widget = E.init div initial_value in
+		let initial_value = D.get_value data in
+		let edit_widget = E.init ~style initial_value in
 		let r = {
 			div = div;
 			edit_widget = edit_widget;
-			controller = controller;
+			data = data;
 			current_mode = View;
 		} in
 		div##onmouseover <- Js_common.handler (onmouseover r) Js._true;

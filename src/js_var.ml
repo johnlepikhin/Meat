@@ -36,7 +36,7 @@ module type GLOBAL_ML_VAR = sig
 end
 
 module GlobalMlVar = functor(N : GLOBAL_ML_VAR) -> struct
-	let get () =
+	let get () : N.t Lwt.t =
 		lwt v = string N.name in
 		let r : N.t option = API.of_string v in
 		match r with

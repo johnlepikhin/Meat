@@ -46,8 +46,6 @@ module RecipesList_F = struct
 
 	let can_delete id = Lwt.return true
 
-	let can_edit id = Js_login.is_authenticated ()
-
 	let css_element = Css_main.Search.Results.element_tr
 
 	let css_element_hover = Css_main.Search.Results.element_tr_hover
@@ -57,4 +55,4 @@ module RecipesList_F = struct
 		Lwt.return r
 end
 
-module ListEdit = Js_EditTable.EditTable(RecipesList_F)
+module ListEdit = Js_EditTable.EditTable(Js_controllers.LoggedIn)(RecipesList_F)

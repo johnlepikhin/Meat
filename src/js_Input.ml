@@ -5,37 +5,37 @@ module DH = Dom_html
 
 module M = struct
 	type t = {
-		textarea : DH.textAreaElement Js.t;
+		input : DH.inputElement Js.t;
 		container : DH.divElement Js.t;
 	}
 
 	type style = {
-		s_textarea : string;
+		s_input : string;
 		s_container : string;
 	}
 
 	let init ~style initial_value =
-		let textarea = DH.createTextarea doc in
+		let input = DH.createInput doc in
 		let container = DH.createDiv doc in
-		Dom.appendChild container textarea;
+		Dom.appendChild container input;
 		container##className <- Js.string style.s_container;
-		textarea##className <- Js.string style.s_textarea;
-		textarea##value <- initial_value;
+		input##className <- Js.string style.s_input;
+		input##value <- initial_value;
 		let r = {
-			textarea = textarea;
+			input = input;
 			container = container;
 		} in
 		r
 
-	let get_value t = t.textarea##value
+	let get_value t = t.input##value
 
-	let set_focus t = t.textarea##focus ()
+	let set_focus t = t.input##focus ()
 
 	let get_container t =
 		Lwt.return t.container
 
 	let update_view div t =
-		let content = doc##createTextNode (t.textarea##value) in
+		let content = doc##createTextNode (t.input##value) in
 		Js_common.removeChilds div;
 		Dom.appendChild div content
 
@@ -53,3 +53,4 @@ module Data = struct
 end
 
 include Js_EditArea.F(M)(Js_controllers.LoggedIn)(Data)
+

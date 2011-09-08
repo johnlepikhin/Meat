@@ -19,22 +19,6 @@ module LoginBlock = struct
 		>>
 end
 
-let escape s =
-	let l = String.length s in
-	let r = Buffer.create (l*3) in
-	for i=0 to l-1 do
-		match s.[i] with
-			| '\\' -> Buffer.add_string r "\\\\"
-			| '\'' -> Buffer.add_string r "\\'"
-			| c ->
-				let cc = Char.code c in
-				if cc < 32 || cc > 127 then
-					Buffer.add_string r (Printf.sprintf "\\x%02x" cc)
-				else
-					Buffer.add_char r c
-	done;
-	Buffer.contents r
-
 let init_js req =
 	let ui = match Processor.Page.userinfo req with
 		| None -> None
@@ -44,7 +28,7 @@ let init_js req =
 		Common.page_name_var, API.to_string req.T_processor.Page.page_type;
 		Common.Login.userinfo_var, API.to_string ui;
 	] @ req.T_processor.Page.js_vars in
-	let vars = List.map (fun (n,v) -> n ^"='" ^ (escape v) ^ "';") vars in
+	let vars = List.map (fun (n,v) -> n ^"='" ^ v ^ "';") vars in
 	let script = String.concat "" vars in
 	let script = XHTML.M.cdata_script script in
 	Lwt.return <<
@@ -73,7 +57,7 @@ let main req content =
 				<div class=$Css_main.Main.Head.div$>
 					$LoginBlock.block$
 				</div>
-				<div id="test" class=$Css_main.Edit.textarea$>
+				<div id="test">
 					test
 				</div>
 				$content$

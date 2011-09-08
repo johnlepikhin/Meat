@@ -10,8 +10,6 @@ module type INFO = sig
 
 	val can_delete: int -> bool Lwt.t
 
-	val can_edit: int -> bool Lwt.t
-
 	val try_delete: int -> bool Lwt.t
 
 	val css_element: string
@@ -19,7 +17,7 @@ module type INFO = sig
 	val css_element_hover: string
 end
 
-module EditTable = functor(Info : INFO) -> struct
+module EditTable = functor(C : Js_controllers.TYPE) -> functor(Info : INFO) -> struct
 
 	let el prefix id coerce =
 		let id = prefix ^ (string_of_int id) in
@@ -29,14 +27,14 @@ module EditTable = functor(Info : INFO) -> struct
 
 	let element_delete id = el Info.delete_div_prefix id Dom_html.CoerceTo.div
 
-	let if_can_edit id f =
-		lwt can_edit = Info.can_edit id in
+	let if_can_edit f =
+		lwt can_edit = C.can_edit () in
 		if can_edit then
 			f ()
 		else
 			Lwt.return ()
 
-	let onmouseover id _ = if_can_edit id (fun () ->
+	let onmouseover id _ = if_can_edit (fun () ->
 		lwt el = element id in
 		el##className <- Js.string Info.css_element_hover;
 		lwt del = element_delete id in
@@ -45,7 +43,7 @@ module EditTable = functor(Info : INFO) -> struct
 		Lwt.return ()
 	)
 
-	let onmouseout id _ = if_can_edit id (fun () ->
+	let onmouseout id _ = if_can_edit (fun () ->
 		lwt el = element id in
 		el##className <- Js.string Info.css_element;
 		lwt del = element_delete id in

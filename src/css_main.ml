@@ -165,6 +165,12 @@ module Recipe = struct
 		"font-size", "2em";
 	]
 
+	let name_input = make (Id int_id) [
+		"text-align", "center";
+		"width", "100%";
+		"font-size", "2em";
+	]
+
 	module Ingridients = struct
 		let container_ul = make (Id int_id) []
 		
@@ -184,14 +190,4 @@ module Recipe = struct
 		]
 		
 	end
-end
-
-module Edit = struct
-	let textarea = make (Id int_id) [
-		"padding", "0px";
-		"margin", "0px";
-		border 1 "red";
-		"width", "100%";
-		"height", "40px";
-	]
 end
