@@ -259,18 +259,10 @@ end
 
 module PageShowRecipe = struct
 	let init () =
-		()
+		eignore Js_ShowRecipe.init ()
 end
 
-let test () =
-	let style = {
-		Js_TextArea.M.s_textarea = "textarea";
-		Js_TextArea.M.s_container = "container";
-	} in
-	Js_TextArea.make ~style ~data:(ref "myval") "test"
-
 let init _ =
-	lwt _ = test () in
 	lwt page_type = Js_mlvar.Page.get () in
 	let _ = match page_type with
 		| API.Page.Main -> PageMain.init ()

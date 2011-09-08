@@ -55,4 +55,6 @@ module Recipe = struct
 	let path_show = ["recipe"]
 
 	let param_name = "q"
+
+	let title_id = string_id
 end

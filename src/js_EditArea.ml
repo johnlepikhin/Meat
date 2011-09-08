@@ -89,4 +89,13 @@ module F = functor(E : EDITWIDGET) -> functor(C : Js_controllers.TYPE) -> functo
 		Lwt.return r
 end
 
+module Data = struct
+	type t = string ref
 
+	let set_value t v =
+		t := Js.to_string v
+
+	let get_value t =
+		let v = !t in
+		Js.string v
+end

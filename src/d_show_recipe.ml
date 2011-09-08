@@ -29,7 +29,7 @@ let of_ingridients = of_nlist of_ingridient
 let f ~ingridients_count ~ingridients ~parts req =
 	Page_template.main req <<
 		<div class=$Css_main.Main.Content.container_div$>
-			<div class=$CR.name_div$>
+			<div class=$CR.title_div$ id=$Common.Recipe.title_id$>
 				$str:(Processor.Page.get req)$
 			</div>
 			<ul class=$CR.Ingridients.container_ul$>

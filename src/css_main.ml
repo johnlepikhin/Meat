@@ -160,15 +160,33 @@ module Search = struct
 end
 
 module Recipe = struct
-	let name_div = make (Id int_id) [
+	let title_div = make (Id int_id) [
 		"text-align", "center";
 		"font-size", "2em";
+		"vertical-align", "middle";
+		"width", "100%";
+		"padding", "1px";
+		"margin", "0px";
 	]
 
-	let name_input = make (Id int_id) [
+	let title_edit_div = make (Id int_id) [
 		"text-align", "center";
-		"width", "100%";
 		"font-size", "2em";
+		"vertical-align", "middle";
+		"width", "100%";
+		"padding", "0px";
+		"margin", "0px";
+	]
+
+	let title_input = make (Id int_id) [
+		"text-align", "center";
+		"width", "70%";
+		"font-size", "inherit";
+		"font", "inherit";
+		"outline", "none";
+		"padding", "0px";
+		"margin", "0px";
+		"border", "1px solid red";
 	]
 
 	module Ingridients = struct

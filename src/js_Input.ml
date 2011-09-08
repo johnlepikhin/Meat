@@ -41,16 +41,4 @@ module M = struct
 
 end
 
-module Data = struct
-	type t = string ref
-
-	let set_value t v =
-		t := Js.to_string v
-
-	let get_value t =
-		let v = !t in
-		Js.string v
-end
-
-include Js_EditArea.F(M)(Js_controllers.LoggedIn)(Data)
-
+module Form = Js_EditArea.F(M)(Js_controllers.LoggedIn)(Js_Form.Param)

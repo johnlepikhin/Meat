@@ -57,9 +57,6 @@ let main req content =
 				<div class=$Css_main.Main.Head.div$>
 					$LoginBlock.block$
 				</div>
-				<div id="test">
-					test
-				</div>
 				$content$
 				<div class=$Css_main.Main.Footer.div$>
 					© $str:Config.start_year$–$str:Config.current_year$ $str:Config.copyright$
