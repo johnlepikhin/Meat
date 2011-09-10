@@ -59,4 +59,9 @@ module Page = struct
 	let get t = t.common.C.get
 
 	let post t = t.common.C.post
+
+	let js_vars t = t.js_vars
+
+	let add_js_var t name value =
+		t.js_vars <- (name, value) :: t.js_vars
 end

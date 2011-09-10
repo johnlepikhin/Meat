@@ -39,7 +39,7 @@ module EditTable = functor(C : Js_controllers.TYPE) -> functor(Info : INFO) -> s
 		el##className <- Js.string Info.css_element_hover;
 		lwt del = element_delete id in
 		lwt cd = Info.can_delete id in
-		del##style##display <- Js.string (if cd then "block" else "none");
+		del##style##display <- Js.string (if cd then Css_main.block else Css_main.none);
 		Lwt.return ()
 	)
 
@@ -47,7 +47,7 @@ module EditTable = functor(C : Js_controllers.TYPE) -> functor(Info : INFO) -> s
 		lwt el = element id in
 		el##className <- Js.string Info.css_element;
 		lwt del = element_delete id in
-		del##style##display <- Js.string "none";
+		del##style##display <- Js.string Css_main.none;
 		Lwt.return ()
 	)
 
@@ -83,9 +83,9 @@ module EditTable = functor(C : Js_controllers.TYPE) -> functor(Info : INFO) -> s
 		lwt ce = Info.can_edit id in
 		lwt del = element_delete id in
 		if ce && cd then
-			del##style##display <- Js.string "block"
+			del##style##display <- Js.string Css_main.block
 		else
-			del##style##display <- Js.string "none";
+			del##style##display <- Js.string Css_main.none;
 *)
 		Lwt.return ()
 

@@ -18,3 +18,11 @@ module SearchResultsIDList = Js_var.GlobalMlVar(struct
 
 	let name = C.Search.Results.ids_list_var
 end)
+
+module ShowRecipe = Js_var.GlobalMlVar(struct
+	type t = API.ShowRecipe.info
+
+	let name = C.Recipe.info_var
+end)
+
+

@@ -22,6 +22,15 @@ module SearchResults = struct
 	type ids_list = int list
 end
 
+module ShowRecipe = struct
+	type id = string
+
+	type info = {
+		title : string;
+		parts : (id * string) list;
+	}
+end
+
 module Seed = struct
 	type t = string
 end

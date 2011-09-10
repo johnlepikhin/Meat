@@ -27,10 +27,16 @@ let of_parts = of_nlist of_part
 let of_ingridients = of_nlist of_ingridient
 
 let f ~ingridients_count ~ingridients ~parts req =
+	let title = Processor.Page.get req in
+	let info = {
+		API.ShowRecipe.title = title;
+		API.ShowRecipe.parts = [];
+	} in
+	Processor.Page.add_js_var req Common.Recipe.info_var (API.to_string info);
 	Page_template.main req <<
 		<div class=$Css_main.Main.Content.container_div$>
 			<div class=$CR.title_div$ id=$Common.Recipe.title_id$>
-				$str:(Processor.Page.get req)$
+				$str:title$
 			</div>
 			<ul class=$CR.Ingridients.container_ul$>
 				$list:of_ingridients ingridients$

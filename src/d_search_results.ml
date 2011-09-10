@@ -28,7 +28,7 @@ let search_results req results =
 		)
 		results
 	in
-	req.T_processor.Page.js_vars <- (Common.Search.Results.ids_list_var, API.to_string !id_list) :: req.T_processor.Page.js_vars;
+	Processor.Page.add_js_var req Common.Search.Results.ids_list_var (API.to_string !id_list);
 	<<
 		<table class=$CR.container_table$>
 			$list:r$

@@ -54,7 +54,11 @@ end
 module Recipe = struct
 	let path_show = ["recipe"]
 
+	let path_save = ["api"; "recipe"; "save"]
+
 	let param_name = "q"
 
 	let title_id = string_id
+
+	let info_var = js_prefix ^ string_id
 end

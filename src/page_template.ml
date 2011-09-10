@@ -19,32 +19,45 @@ module LoginBlock = struct
 		>>
 end
 
-let init_js req =
-	let ui = match Processor.Page.userinfo req with
-		| None -> None
-		| Some u -> Some u.Session.User.info
-	in
-	let vars = [
-		Common.page_name_var, API.to_string req.T_processor.Page.page_type;
-		Common.Login.userinfo_var, API.to_string ui;
-	] @ req.T_processor.Page.js_vars in
-	let vars = List.map (fun (n,v) -> n ^"='" ^ v ^ "';") vars in
-	let script = String.concat "" vars in
-	let script = XHTML.M.cdata_script script in
-	Lwt.return <<
-		<script type="text/javascript">$script$</script>
-	>>
+module JsVarsBlock = struct
+	let block req =
+		let ui = match Processor.Page.userinfo req with
+			| None -> None
+			| Some u -> Some u.Session.User.info
+		in
+		Processor.Page.add_js_var req Common.page_name_var (API.to_string req.T_processor.Page.page_type);
+		Processor.Page.add_js_var req Common.Login.userinfo_var (API.to_string ui);
+		let buf = Buffer.create 16300 in
+		let rec loop = function
+			| [] -> ()
+			| (n,v) :: tl ->
+				Buffer.add_string buf n;
+				Buffer.add_string buf "='";
+				Buffer.add_string buf v;
+				Buffer.add_string buf "';";
+				loop tl
+		in
+		loop (Processor.Page.js_vars req);
+		let script = XHTML.M.cdata_script (Buffer.contents buf) in
+		Lwt.return <<
+			<script type="text/javascript">$script$</script>
+		>>
+end
+
+module JsScriptsBlock = struct
+	let block req =
+		match req.T_processor.Page.js_scripts with
+			| None -> [
+					<< <script type="text/javascript" src="/js/sha.js"/> >>;
+					<< <script type="text/javascript" src="/js/js_main.js"/> >>;
+				]
+			| Some lst ->
+				mapl lst (<< <script type="text/javascript" src=$__$/> >>)
+end
 
 let main req content =
-	lwt init_js = init_js req in
-	let js_scripts = match req.T_processor.Page.js_scripts with
-		| None -> [
-				<< <script type="text/javascript" src="/js/sha.js"/> >>;
-				<< <script type="text/javascript" src="/js/js_main.js"/> >>;
-			]
-		| Some lst ->
-			mapl lst (<< <script type="text/javascript" src=$__$/> >>)
-	in
+	lwt js_vars = JsVarsBlock.block req in
+	let js_scripts = JsScriptsBlock.block req in
 	Lwt.return <<
 		<html>
 			<head>
@@ -53,7 +66,7 @@ let main req content =
 				$list:js_scripts$
 			</head>
 			<body id=$Common.body_id$>
-				$init_js$
+				$js_vars$
 				<div class=$Css_main.Main.Head.div$>
 					$LoginBlock.block$
 				</div>

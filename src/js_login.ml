@@ -19,21 +19,21 @@ let username_div = EID.init C.Login.username_div_id DH.CoerceTo.div
 
 let logged_out () =
 	lwt login_div = login_div () in
-	login_div##style##display <- string "block";
+	login_div##style##display <- string Css_main.block;
 	lwt logout_div = logout_div () in
 
-	logout_div##style##display <- string "none";
+	logout_div##style##display <- string Css_main.none;
 	Js_mlvar.UserInfo.set None;
 	List.iter (fun f -> f ()) !on_logout;
 	Lwt.return ()
 
 let logged_in info =
 	lwt login_div = login_div () in
-	login_div##style##display <- string "none";
+	login_div##style##display <- string Css_main.none;
 
 	lwt logout_div = logout_div () in
 	lwt username_div = username_div () in
-	logout_div##style##display <- string "block";
+	logout_div##style##display <- string Css_main.block;
 	username_div##innerHTML <- string info.API.Login.person;
 	Js_mlvar.UserInfo.set (Some info);
 	List.iter (fun f -> f info) !on_login;
