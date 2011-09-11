@@ -4,14 +4,13 @@
 <ocsipersist*.ml>: pkg_ocsigen.server
 
 <d_*.ml>: pkg_ocsigen_xhtml.syntax
-<io*.ml>: pkg_atdgen
-<io*.mli>: pkg_atdgen
 <js_*.ml>: pkg_js_of_ocaml, pkg_js_of_ocaml.syntax
+<l_HTML*.ml>: pkg_ocsigen_xhtml
 "page_template.ml": pkg_ocsigen_xhtml.syntax
 "eliom_no_meat.ml": pkg_ocsigen.ext.eliom
 <*.cmxa>: pkg_pgocaml
 <*.cmxs>: pkg_pgocaml, pkg_threads
 <js_*.byte>: pkg_lwt, pkg_js_of_ocaml
 
-<*.native>: pkg_pgocaml, pkg_threads, pkg_lwt, pkg_lwt.unix
+<*.native>: pkg_pgocaml, pkg_threads, pkg_lwt, pkg_lwt.unix, pkg_ocsigen_xhtml
 
