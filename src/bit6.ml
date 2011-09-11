@@ -1,5 +1,5 @@
 
-let chars = "QWERTYUIOP{}ASDFGHJKL:ZXCVBNM@#$qwertyuiop[]asdfghjkl;zxcvbnm%^&"
+let chars = "QWERTYUIOP{}ASDFGHJKL:ZXCVBNM@#$qwertyuiop[]asdfghjkl*zxcvbnm%^-"
 
 let echar = '.'
 
