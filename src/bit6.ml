@@ -60,3 +60,15 @@ let decode s =
 	in
 	loop 0 0;
 	Buffer.contents r
+
+let a_to_bit6 s =
+	let v = Marshal.to_string s [] in
+	encode v
+
+let bit6_to_a s =
+	let v = decode s in
+	try
+		let v = Marshal.from_string v 0 in
+		Some v
+	with
+		| _ -> None

@@ -9,28 +9,40 @@ module C = Common
 let on_login = ref []
 let on_logout = ref []
 
-let login_div = EID.init C.Login.login_container_id DH.CoerceTo.div
-let logout_div = EID.init C.Login.logout_container_id DH.CoerceTo.div
-let logout_button_div = EID.init C.Login.logout_id DH.CoerceTo.div
+let login_div = EID.div C.Login.login_container_id
+let logout_div = EID.div C.Login.logout_container_id
+let logout_button_div = EID.div C.Login.logout_id
 let username_input = EID.init C.Login.username_input_id DH.CoerceTo.input
 let password_input = EID.init C.Login.password_input_id DH.CoerceTo.input
 let username_submit = EID.init C.Login.username_submit_id DH.CoerceTo.input
-let username_div = EID.init C.Login.username_div_id DH.CoerceTo.div
+let username_div = EID.div C.Login.username_div_id
 
 let cookie_name = "eliompersistentsession|"
+
+let storage_userinfo = "userinfo"
 
 let have_cookie () =
 	Js_cookie.exists cookie_name
 
+let set_userinfo v =
+	Js_storage.Common.set ~timeout:3600. ~name:storage_userinfo v
+
+let update_userinfo () =
+	lwt info = Js_API.request ~args:[] Common.API.path_userinfo in
+	set_userinfo info;
+	Lwt.return info
+
 let get_userinfo () =
 	if have_cookie () then
-		lwt info = Js_mlvar.UserInfo.get_opt () in
-		match info with
-			| Some info -> Lwt.return info
-			| None ->
-				lwt info = Js_API.request ~args:[] Common.API.path_userinfo in
-				Js_mlvar.UserInfo.set info;
-				Lwt.return info
+		try_lwt
+			let info : API.Login.info option option = Js_storage.Common.get storage_userinfo in
+			match info with
+				| Some info ->
+				 	Lwt.return info
+				| None ->
+					update_userinfo ()
+		with
+			| _ -> update_userinfo ()
 	else
 		Lwt.return None
 
@@ -40,7 +52,7 @@ let logged_out () =
 	lwt logout_div = logout_div () in
 
 	logout_div##style##display <- string Css_main.none;
-	Js_mlvar.UserInfo.set None;
+	set_userinfo None;
 	List.iter (fun f -> f ()) !on_logout;
 	Lwt.return ()
 
@@ -52,7 +64,7 @@ let logged_in info =
 	lwt username_div = username_div () in
 	logout_div##style##display <- string Css_main.block;
 	username_div##innerHTML <- string info.API.Login.person;
-	Js_mlvar.UserInfo.set (Some info);
+	set_userinfo (Some info);
 	List.iter (fun f -> f info) !on_login;
 	Lwt.return ()
 

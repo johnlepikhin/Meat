@@ -37,6 +37,7 @@ module API = struct
 
 	let _ = register S.recipe_name_complete P.recipe_name_complete
 	let _ = register S.recipe_ingridients P.recipe_ingridients
+	let _ = register S.recipe_get P.recipe_get
 	let _ = register S.login P.login
 	let _ = register S.logout P.logout
 	let _ = register S.seed P.seed

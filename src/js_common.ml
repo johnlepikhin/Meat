@@ -49,6 +49,8 @@ module EID = struct
 		lwt f = f () in
 		let r = to_string (f##value) in
 		Lwt.return r
+
+	let div id = init id Dom_html.CoerceTo.div
 end
 
 let body = EID.init Common.body_id Dom_html.CoerceTo.body

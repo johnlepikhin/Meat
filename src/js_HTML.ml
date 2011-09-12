@@ -8,6 +8,7 @@ open Js
 
 let attribute_to_JS el = function
 	| Id v -> el##id <- string v
+	| Class v -> el##className <- string v
 
 let rec el_to_JS = function
 	| EDiv ->
@@ -18,6 +19,12 @@ let rec el_to_JS = function
 		img##alt <- string alt;
 		img##src <- string src;
 		Js_common.Coerce.coerce img Dom_html.CoerceTo.element
+	| ETextArea (rows, cols, content) ->
+		let area = createTextarea doc in
+		area##rows <- rows;
+		area##cols <- cols;
+		Js_common.appendText area content;
+		Js_common.Coerce.coerce area Dom_html.CoerceTo.element
 
 and to_JS parent = function
 	| Node n ->

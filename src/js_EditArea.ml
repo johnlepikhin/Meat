@@ -73,7 +73,7 @@ module F = functor(E : EDITWIDGET) -> functor(C : Js_controllers.TYPE) -> functo
 		set_view_mode t
 
 	let make ~data ~style id =
-		lwt div = (Js_common.EID.init id Dom_html.CoerceTo.div) () in
+		lwt div = (Js_common.EID.div id) () in
 		let initial_value = D.get_value data in
 		let edit_widget = E.init ~style initial_value in
 		let r = {

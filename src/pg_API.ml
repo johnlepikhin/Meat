@@ -8,11 +8,14 @@ let return v =
 let ok v =
 	return (API.Data v)
 
-let no_post req =
-	return (API.Error "You must POST data")
+let error v =
+	return (API.Error v)
 
-let wrong_parameters sp _ =
-	return (API.Error "Wrong parameters")
+let internal_error () = error "Internal error"
+
+let no_post req = error "You must POST data"
+
+let wrong_parameters sp _ = error "Wrong parameters"
 
 let recipe_name_complete req =
 	let name = req.R.post ^ "%" in
@@ -31,6 +34,22 @@ let recipe_ingridients req =
 		where ingridient.orig_id=(select id from recipe where name=$name)"
 	in
 	ok r
+
+let recipe_get req =
+	let name = req.R.post in
+	lwt r = PGSQL(req.R.db) "select recipe.name, recipe.text
+		from recipe
+		where recipe.name=$name"
+	in
+	match r with
+		| [(name, text)] ->
+			let r = {
+				API.Recipe.title = name;
+				API.Recipe.text = text;
+			} in
+			ok r
+		| _ ->
+			internal_error ()
 
 let get_seed req =
 	let v = Eliom_sessions.get_volatile_session_data ~sp:req.R.sp ~table:Session.seed () in

@@ -15,8 +15,8 @@ module Ingridients = struct
 	let form = EID.init FS.form_id DH.CoerceTo.form
 
 	module Selection = struct
-		let ingridients_list = EID.init FS.selected_ingridients_list_id DH.CoerceTo.div
-		let hidden_inputs = EID.init FS.selected_ingridients_inputs_id DH.CoerceTo.div
+		let ingridients_list = EID.div FS.selected_ingridients_list_id
+		let hidden_inputs = EID.div FS.selected_ingridients_inputs_id
 
 		let list = ref []
 
@@ -77,7 +77,7 @@ module Ingridients = struct
 	module Autocomplete = struct
 		module CF = CF.Ingridients.Autocomplete
 
-		let autocomplete_div = EID.init FS.autocomplete_id DH.CoerceTo.div
+		let autocomplete_div = EID.div FS.autocomplete_id
 
 		let selection = ref None
 
@@ -254,13 +254,11 @@ end
 module PageSearchResults = struct
 	let init () =
 		eignore Ingridients.init ();
-		Js_results.ListEdit.init ()
 end
 
 module PageShowRecipe = struct
 	let init () =
-		()
-(*		eignore Js_ShowRecipe.init () *)
+		eignore Js_ShowRecipe.init ()
 end
 
 let init _ =

@@ -24,12 +24,10 @@ module SearchResults = struct
 	type ids_list = int list
 end
 
-module ShowRecipe = struct
-	type id = string
-
+module Recipe = struct
 	type info = {
 		title : string;
-		parts : (id * string) list;
+		text : string;
 	}
 end
 
@@ -54,14 +52,6 @@ type 'a t =
 	| Error of string
 	| Data of 'a
 
-let to_string v =
-	let s = Marshal.to_string v [] in
-	Bit6.encode s
+let to_string = Bit6.a_to_bit6
 
-let of_string s =
-	try
-		let s = Bit6.decode s in
-		let r = Marshal.from_string s 0 in
-		Some r
-	with
-		| _ -> None
+let of_string = Bit6.bit6_to_a

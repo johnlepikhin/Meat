@@ -151,20 +151,6 @@ module Search = struct
 
 		let element_tr = make (Id int_id) []
 
-		let element_tr_hover = make (Id int_id) [
-			"background", "#9090ff";
-		]
-
-		let delete_td = make (Id int_id) [
-			padding0;
-			"width", "2em";
-		]
-
-		let delete_div = make (Id int_id) [
-			display_none;
-			"cursor", "pointer";
-		]
-
 		let name_td = make (Id int_id) [
 			padding0;
 			width 30;
@@ -206,11 +192,14 @@ module Recipe = struct
 		border 1 "red";
 	]
 
+	let edit_div = make (Id int_id) []
+
 	module Ingridients = struct
 		let container_ul = make (Id int_id) []
 		
 		let ingridient_li = make (Id int_id) []
 	end
+
 	module Parts = struct
 		let container_div = make (Id int_id) []
 		

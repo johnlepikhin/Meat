@@ -15,11 +15,9 @@ module Expires = struct
 	let to_string = function
 		| Never -> tag ^ "Fri, 2038-01-01 00:00:00 GMT"
 		| Seconds o ->
-			let now = jsnew date_now () in
-			let t = to_float (now##getTime ()) in
-			let t = t +. o *. 1000. in
-			let t = to_float (now##setTime (t)) in
-			let now = jsnew date_fromTimeValue (t) in
+			let t = Js_date.now () in
+			let t = t +. o in
+			let now = jsnew date_fromTimeValue (t *. 1000.) in
 			let r = now##toGMTString () in
 			tag ^ (to_string r)
 		| OnClose -> ""

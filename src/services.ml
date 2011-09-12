@@ -36,6 +36,7 @@ module API = struct
 
 	let recipe_name_complete = api C.path_recipe_name_complete (string "q")
 	let recipe_ingridients = api C.path_recipe_ingridients (string "q")
+	let recipe_get = api C.path_recipe_get (string "q")
 
 	let login = api C.path_login (string "username" ** string "hash")
 	let logout = api C.path_logout unit

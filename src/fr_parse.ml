@@ -7,9 +7,18 @@ let rec loop_steps f = function
 		f hd;
 		loop_steps f tl
 
-let rec to_html = function
+let rec to_html n = function
 	| [] -> []
-	| step :: tl -> div [text step.T_recipe.Step.text] :: to_html tl
+	| step :: tl ->
+		let step =
+			div ~a:[a_class Css_main.Recipe.Parts.part_div] [
+				div ~a:[a_class Css_main.Recipe.Parts.part_number] [
+					text ((string_of_int n) ^ ".")
+				];
+				text step.T_recipe.Step.text
+			]
+		in
+		step :: to_html (n+1) tl
 
 (*
 let to_format l =
@@ -22,11 +31,11 @@ let to_format l =
 	Buffer.contents b
 *)
 
-let to_html =
+let to_html s =
 	try
 		let l = Lexing.from_string s in
 		let steps = Fr_grammar.input Fr_lexer.recipe l in
-		let r = to_html steps in
+		let r = to_html 1 steps in
 		Some r
 	with
 		| _ -> None

@@ -29,6 +29,7 @@ module ShowIngridients = struct
 end
 *)
 
+(*
 module LstVar = Js_var.GlobalMlVar(struct
 	type t = API.SearchResults.ids_list
 
@@ -56,3 +57,4 @@ module RecipesList_F = struct
 end
 
 module ListEdit = Js_EditTable.EditTable(Js_controllers.LoggedIn)(RecipesList_F)
+*)
