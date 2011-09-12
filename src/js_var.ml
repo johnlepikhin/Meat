@@ -36,9 +36,16 @@ module type GLOBAL_ML_VAR = sig
 end
 
 module GlobalMlVar = functor(N : GLOBAL_ML_VAR) -> struct
+	let get_opt () : N.t option Lwt.t =
+		match var_opt N.name with
+			| None -> Lwt.return None
+			| Some v ->
+				let v = Js.to_string v in
+				let r : N.t option = API.of_string v in
+				Lwt.return r
+
 	let get () : N.t Lwt.t =
-		lwt v = string N.name in
-		let r : N.t option = API.of_string v in
+		lwt r = get_opt () in
 		match r with
 			| None -> fatal ("Не найдена одна очень важная переменная: " ^ N.name)
 			| Some v -> Lwt.return v

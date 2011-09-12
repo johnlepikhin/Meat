@@ -72,7 +72,7 @@ let login req =
 				Session.User.info = info;
 			} in
 			lwt _ = Eliom_sessions.set_persistent_session_data ~table:Session.User.user ~sp:req.R.sp t in
-			req.R.userinfo <- Some t;
+			req.R.userinfo <- Lazy.lazy_from_fun (fun () -> Lwt.return (Some t));
 			Lwt.return (API.Login.Ok info)
 		| _ ->
 			lwt _ = Lwt_unix.sleep (Random.float 3.) in
@@ -82,5 +82,13 @@ let login req =
 
 let logout req =
 	lwt _ = Eliom_sessions.remove_persistent_session_data ~sp:req.R.sp ~table:Session.User.user () in
-	req.R.userinfo <- None;
+	req.R.userinfo <- Lazy.lazy_from_fun (fun () -> Lwt.return None);
 	ok API.Action.Ok
+
+let userinfo req =
+	lwt ui = Processor.Common.userinfo req in
+	let ui = match ui with
+		| Some u -> Some u.Session.User.info
+		| None -> None
+	in
+	ok ui

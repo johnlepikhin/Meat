@@ -40,4 +40,5 @@ module API = struct
 	let login = api C.path_login (string "username" ** string "hash")
 	let logout = api C.path_logout unit
 	let seed = api C.path_seed unit
+	let userinfo = api C.path_userinfo unit
 end

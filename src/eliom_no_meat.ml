@@ -40,4 +40,5 @@ module API = struct
 	let _ = register S.login P.login
 	let _ = register S.logout P.logout
 	let _ = register S.seed P.seed
+	let _ = register S.userinfo P.userinfo
 end

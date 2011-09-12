@@ -1,4 +1,6 @@
 
+let version = 1
+
 module Page = struct
 	type t =
 		| Main

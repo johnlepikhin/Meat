@@ -259,7 +259,8 @@ end
 
 module PageShowRecipe = struct
 	let init () =
-		eignore Js_ShowRecipe.init ()
+		()
+(*		eignore Js_ShowRecipe.init () *)
 end
 
 let init _ =

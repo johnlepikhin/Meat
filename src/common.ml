@@ -11,6 +11,7 @@ module API = struct
 	let path_login = ["api"; "login"]
 	let path_logout = ["api"; "logout"]
 	let path_seed = ["api"; "seed"]
+	let path_userinfo = ["api"; "userinfo"]
 end
 
 module Login = struct

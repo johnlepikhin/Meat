@@ -2,7 +2,7 @@
 module Common = struct
 	open T_processor.Common
 
-	let get_userinfo sp =
+	let get_userinfo sp () =
 		lwt user = Eliom_sessions.get_persistent_session_data ~table:Session.User.user ~sp () in
 		let userinfo = match user with
 			| Eliom_sessions.No_data
@@ -14,13 +14,12 @@ module Common = struct
 	let call ~f sp get post =
 		Db.use (fun db ->
 			lwt _ = PGSQL(db) "begin transaction" in
-			lwt userinfo = get_userinfo sp in
 			let t = {
 				sp = sp;
 				get = get;
 				post = post;
 				db = db;
-				userinfo = userinfo;
+				userinfo = Lazy.lazy_from_fun (get_userinfo sp);
 			} in
 			try_lwt
 				lwt r = f t in
@@ -31,6 +30,8 @@ module Common = struct
 					lwt _ = PGSQL(db) "rollback" in
 					Lwt.fail e
 		)
+
+	let userinfo t = Lazy.force t.userinfo
 end
 
 module Page = struct
@@ -50,7 +51,7 @@ module Page = struct
 		in
 		Common.call ~f sp get post
 
-	let userinfo t = t.common.C.userinfo
+	let userinfo t = Lazy.force t.common.C.userinfo
 
 	let sp t = t.common.C.sp
 

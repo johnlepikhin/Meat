@@ -17,6 +17,23 @@ let password_input = EID.init C.Login.password_input_id DH.CoerceTo.input
 let username_submit = EID.init C.Login.username_submit_id DH.CoerceTo.input
 let username_div = EID.init C.Login.username_div_id DH.CoerceTo.div
 
+let cookie_name = "eliompersistentsession|"
+
+let have_cookie () =
+	Js_cookie.exists cookie_name
+
+let get_userinfo () =
+	if have_cookie () then
+		lwt info = Js_mlvar.UserInfo.get_opt () in
+		match info with
+			| Some info -> Lwt.return info
+			| None ->
+				lwt info = Js_API.request ~args:[] Common.API.path_userinfo in
+				Js_mlvar.UserInfo.set info;
+				Lwt.return info
+	else
+		Lwt.return None
+
 let logged_out () =
 	lwt login_div = login_div () in
 	login_div##style##display <- string Css_main.block;
@@ -112,7 +129,7 @@ let do_kb_login e =
 		Lwt.return ()
 
 let is_authenticated () =
-	lwt info = Js_mlvar.UserInfo.get () in
+	lwt info = get_userinfo () in
 	match info with
 		| None -> Lwt.return false
 		| Some _ -> Lwt.return true
@@ -139,7 +156,7 @@ let init () =
 	password_input##onkeypress <- handler do_kb_login _true;
 	lwt logout_button_div = logout_button_div () in
 	logout_button_div##onmouseup <- handler do_logout _true;
-	lwt info = Js_mlvar.UserInfo.get () in
+	lwt info = get_userinfo () in
 	match info with
 		| None -> logged_out ()
 		| Some info -> logged_in info

@@ -35,6 +35,7 @@ let all =
 	let eq = Regexp.regexp "([^=]+)=(.+)" in
 	fun () ->
 		let v = Unsafe.get doc vname in
+		let v = to_string v in
 		let l = Regexp.split sep v in
 		mapl l (
 			let r = Regexp.string_match eq __ 0 in
@@ -53,6 +54,10 @@ let get name =
 		Lwt.return r
 	with
 		| e -> Lwt.fail e
+
+let exists name =
+	let l = all () in
+	List.mem_assoc name l
 
 let remove name =
 	set ~expires:(Expires.Seconds (-99999999.)) name ""

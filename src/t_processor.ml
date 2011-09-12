@@ -5,7 +5,7 @@ module Common = struct
 		get : 'a;
 		post : 'b;
 		db : Db.t;
-		mutable userinfo : Session.User.t option;
+		mutable userinfo : Session.User.t option Lwt.t Lazy.t;
 	}
 end
 
