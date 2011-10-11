@@ -30,6 +30,8 @@ type flow = [ heading | block | inline ]
 
 val a_class : string -> [< common ] attribute
 
+val a_id : string -> [< common ] attribute
+
 
 val text: string -> [> `PCDATA ] t
 

@@ -14,7 +14,20 @@ module Step = struct
 	}
 end
 
-type t = {
-	title : string;
-	steps : Step.t list;
-}
+module Recipe = struct
+	type t = {
+		name : string;
+		steps : Step.t list;
+		(* TODO add ingridients *)
+	}
+end
+
+module Component = struct
+	type t = {
+		name : string;
+	}
+end
+
+type t =
+	| Recipe of Recipe.t
+	| Component of Component.t

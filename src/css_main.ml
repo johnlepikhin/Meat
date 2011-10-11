@@ -163,7 +163,9 @@ module Search = struct
 end
 
 module Recipe = struct
-	let title_div = make (Id int_id) [
+	let container_div = make (Id int_id) []
+
+	let name_div = make (Id int_id) [
 		"text-align", "center";
 		"font-size", "2em";
 		"vertical-align", "middle";
@@ -172,34 +174,25 @@ module Recipe = struct
 		margin0;
 	]
 
-	let title_edit_div = make (Id int_id) [
-		"text-align", "center";
-		"font-size", "2em";
-		"vertical-align", "middle";
-		width100;
-		padding0;
-		margin0;
-	]
+	let steps_div = make (Id int_id) []
 
-	let title_input = make (Id int_id) [
-		"text-align", "center";
-		width 70;
-		"font-size", "inherit";
-		"font", "inherit";
-		"outline", none;
-		padding0;
-		margin0;
-		border 1 "red";
-	]
+	let edit_text_textarea = make (Id int_id) []
 
-	let edit_div = make (Id int_id) []
+	module Step = struct
+		let container_div = make (Id int_id) []
 
+		let n_div = make (Id int_id) []
+
+		let text_div = make (Id int_id) []
+	end
+	
 	module Ingridients = struct
 		let container_ul = make (Id int_id) []
 		
 		let ingridient_li = make (Id int_id) []
 	end
 
+(*
 	module Parts = struct
 		let container_div = make (Id int_id) []
 		
@@ -214,4 +207,18 @@ module Recipe = struct
 		]
 		
 	end
+*)
+end
+
+module Component = struct
+	let content_div = make (Id int_id) []
+
+	let name_div = make (Id int_id) [
+		"text-align", "center";
+		"font-size", "2em";
+		"vertical-align", "middle";
+		width100;
+		padding 1;
+		margin0;
+	]
 end

@@ -34,15 +34,18 @@ let all =
 	fun () ->
 		let v = Unsafe.get doc vname in
 		let v = to_string v in
-		let l = Regexp.split sep v in
-		mapl l (
-			let r = Regexp.string_match eq __ 0 in
-			match r with
-				| Some r ->
-					let n = match Regexp.matched_group r 1 with Some v -> v | None -> raise Not_found in
-					let v = match Regexp.matched_group r 2 with Some v -> v | None -> raise Not_found in
-					n, v
-				| None -> raise Not_found
+		match v with
+			| "" -> []
+			| v ->
+				let l = Regexp.split sep v in
+				mapl l (
+					let r = Regexp.string_match eq __ 0 in
+					match r with
+						| Some r ->
+							let n = match Regexp.matched_group r 1 with Some v -> v | None -> raise Not_found in
+							let v = match Regexp.matched_group r 2 with Some v -> v | None -> raise Not_found in
+							n, v
+						| None -> raise Not_found
 		)
 
 let get name =

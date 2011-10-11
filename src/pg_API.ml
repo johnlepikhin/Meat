@@ -51,6 +51,19 @@ let recipe_get req =
 		| _ ->
 			internal_error ()
 
+let recipe_set req =
+	let (name, text) = req.R.post in
+	if Fr_parse.have_errors text then
+		ok (API.Action.Error "Описание рецепта содержит ошибки!")
+	else
+		lwt r = PGSQL(req.R.db) "select id from recipe where name=$name" in
+		match r with
+			| [_] ->
+				lwt _ = PGSQL(req.R.db) "update recipe set text=$text where name=$name" in
+				ok (API.Action.Ok)
+			| _ ->
+				ok (API.Action.Error "Рецепт с таким именем не найден")
+
 let get_seed req =
 	let v = Eliom_sessions.get_volatile_session_data ~sp:req.R.sp ~table:Session.seed () in
 	match v with

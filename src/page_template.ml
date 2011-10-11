@@ -21,14 +21,7 @@ end
 
 module JsVarsBlock = struct
 	let block req =
-(*	
-		let ui = match Processor.Page.userinfo req with
-			| None -> None
-			| Some u -> Some u.Session.User.info
-		in
-*)
-		Processor.Page.add_js_var req Common.page_name_var (API.to_string req.T_processor.Page.page_type);
-(*		Processor.Page.add_js_var req Common.Login.userinfo_var (API.to_string ui); *)
+		Processor.Page.add_js_var req Common.page_name_var req.T_processor.Page.page_type;
 		let buf = Buffer.create 16300 in
 		let rec loop = function
 			| [] -> ()

@@ -25,6 +25,8 @@ module SearchResults = struct
 end
 
 module Recipe = struct
+	type name = string
+
 	type info = {
 		title : string;
 		text : string;

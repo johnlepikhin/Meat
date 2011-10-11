@@ -15,6 +15,7 @@ let f req =
 	match r with
 		| [(id, name, text, ingridients_count)] ->
 			lwt ingridients = get_ingridients id in
+			Processor.Page.add_js_var req Common.Recipe.name_var name;
 			D_show_recipe.f ~ingridients_count ~ingridients ~text req
 		| _ ->
 			D_show_recipe.not_found req

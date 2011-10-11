@@ -47,6 +47,8 @@ let leaf name ?a () = XML.node name ?a []
 
 let a_class name = Class name
 
+let a_id id = Id id
+
 
 let div = XML.node EDiv
 

@@ -109,6 +109,10 @@ let removeElement el =
 
 let appendText n t = D.appendChild n (DH.document##createTextNode (string t))
 
+let setText n t =
+	removeChilds n;
+	appendText n t
+
 let asDiv el = Coerce.coerce el Dom_html.CoerceTo.div
 
 let asElement el = Coerce.coerce el Dom_html.CoerceTo.element

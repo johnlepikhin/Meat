@@ -64,5 +64,6 @@ module Page = struct
 	let js_vars t = t.js_vars
 
 	let add_js_var t name value =
+		let value = API.to_string value in
 		t.js_vars <- (name, value) :: t.js_vars
 end
