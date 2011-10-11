@@ -7,31 +7,6 @@ let rec loop_steps f = function
 		f hd;
 		loop_steps f tl
 
-(*
-let rec to_html n = function
-	| [] -> []
-	| step :: tl ->
-		let step =
-			div ~a:[a_class Css_main.Recipe.Parts.part_div] [
-				div ~a:[a_class Css_main.Recipe.Parts.part_number] [
-					text ((string_of_int n) ^ ".")
-				];
-				text step.T_recipe.Step.text
-			]
-		in
-		step :: to_html (n+1) tl
-*)
-(*
-let to_format l =
-	let b = Buffer.create 16380 in
-	loop_steps (fun step ->
-		Buffer.add_string b "step {\n\t";
-		Buffer.add_string b step.T_recipe.Step.text;
-		Buffer.add_string b "}\n"
-	) l;
-	Buffer.contents b
-*)
-
 let step_to_html n r =
 	div ~a:[a_class Css_main.Recipe.Step.container_div] [
 		div ~a:[a_class Css_main.Recipe.Step.n_div] [
@@ -46,12 +21,20 @@ let steps_to_html l =
 	let n = ref 0 in
 	List.map (fun step -> incr n; step_to_html !n step) l
 
+let ingridient_to_html r =
+	div ~a:[a_class Css_main.Recipe.Ingridient.container_div] [
+		text r.T_recipe.Ingridient.name
+	]
+
+let ingridients_to_html = List.map ingridient_to_html
+
 let recipe_to_html r =
 	div ~a:[a_class Css_main.Recipe.container_div; a_id Common.Recipe.container_div_id] [
 		div ~a:[a_class Css_main.Recipe.name_div] [
 			text r.T_recipe.Recipe.name
 		];
-		div ~a:[a_class Css_main.Recipe.steps_div] (steps_to_html r.T_recipe.Recipe.steps)
+		div ~a:[a_class Css_main.Recipe.ingridients_div] (ingridients_to_html r.T_recipe.Recipe.ingridients);
+		div ~a:[a_class Css_main.Recipe.steps_div] (steps_to_html r.T_recipe.Recipe.steps);
 	]
 
 let component_to_html r =

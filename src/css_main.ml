@@ -176,6 +176,8 @@ module Recipe = struct
 
 	let steps_div = make (Id int_id) []
 
+	let ingridients_div = make (Id int_id) []
+
 	let edit_text_textarea = make (Id int_id) []
 
 	module Step = struct
@@ -186,10 +188,8 @@ module Recipe = struct
 		let text_div = make (Id int_id) []
 	end
 	
-	module Ingridients = struct
-		let container_ul = make (Id int_id) []
-		
-		let ingridient_li = make (Id int_id) []
+	module Ingridient = struct
+		let container_div = make (Id int_id) []
 	end
 
 (*

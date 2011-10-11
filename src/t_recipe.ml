@@ -9,8 +9,18 @@ module Step = struct
 		text : StepText.t;
 	}
 
-	let default text = {
+	let make text = {
 		text = text;
+	}
+end
+
+module Ingridient = struct
+	type t = {
+		name : string;
+	}
+
+	let make name = {
+		name = name;
 	}
 end
 
@@ -18,7 +28,7 @@ module Recipe = struct
 	type t = {
 		name : string;
 		steps : Step.t list;
-		(* TODO add ingridients *)
+		ingridients : Ingridient.t list;
 	}
 end
 
