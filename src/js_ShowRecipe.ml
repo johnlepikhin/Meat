@@ -3,6 +3,9 @@ open Js
 open Js_primitives
 open Js_common
 
+module RecipeSetC = Js_API.MakeC(API.RecipeSet)
+module RecipeGetC = Js_API.MakeC(API.RecipeGet)
+
 let edit_div = Js_common.EID.div Common.Recipe.edit_div_id
 let container_div = Js_common.EID.div Common.Recipe.container_div_id
 
@@ -21,16 +24,17 @@ let saving_text = "Сохрянется…"
 let error_text = "Текст содержит ошибки"
 
 let save t =
+	t.submit##disabled <- _true;
 	setText t.submit saving_text;
 	let text = to_string (t.textarea##value) in
 	lwt recipe_name = Js_mlvar.RecipeName.get () in
-	lwt r = Js_API.request ~args:["q", recipe_name; "text", text] Common.API.path_recipe_set in
+	lwt r = RecipeSetC.q ["q", recipe_name; "text", text] in
 	match r with
-		| API.Action.Ok ->
+		| API.Data _ ->
 			setText t.submit saved_text;
 			t.submit##disabled <- _true;
 			Lwt.return ()
-		| API.Action.Error error ->
+		| API.Error error ->
 			alert ("Произошла ошибка сохранения рецепта:\n\n" ^ error);
 			setText t.submit save_text;
 			Lwt.return ()
@@ -84,10 +88,15 @@ let edit_keypressed =
 let show_edit t =
 	lwt edit_div = edit_div () in
 	lwt recipe_name = Js_mlvar.RecipeName.get () in
-	lwt r = Js_API.request ~args:["q", recipe_name] Common.API.path_recipe_get in
-	t.textarea##value <- string r.API.Recipe.text;
-	edit_div##style##display <- string Css_main.block;
-	Lwt.return ()
+	lwt r = RecipeGetC.q ["q", recipe_name] in
+	match r with
+		| API.Error s ->
+			alert ("Не удалось получить рецепт: " ^ s);
+			Lwt.return ()
+		| API.Data r ->
+			t.textarea##value <- string r.API.Recipe.text;
+			edit_div##style##display <- string Css_main.block;
+			Lwt.return ()
 
 let hide_edit t =
 	lwt edit_div = edit_div () in

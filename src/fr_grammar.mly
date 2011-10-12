@@ -3,7 +3,7 @@
 %}
 
 %token EOF QLeftBrace QRightBrace QLeftFigure QRightFigure Eq
-%token Step Component Recipe
+%token Step Recipe Ingridient
 %token <string> Text Lident Quoted
 
 %start input
@@ -12,22 +12,17 @@
 %%
 
 input:
-	| Component Quoted EOF {
-		T_recipe.Component {
-			T_recipe.Component.name = $2;
-		}
-	}
 	| Recipe Quoted QLeftFigure recipe_entries QRightFigure EOF {
 		let steps = ref [] in
 		let ingridients = ref [] in
-		List.map (function
+		List.iter (function
 			| Fr_type.Step v -> steps := v :: !steps
 			| Fr_type.Ingridient v -> ingridients := v :: !ingridients
 		) $4;
-		T_recipe.Recipe {
-			T_recipe.Recipe.name = $2;
-			T_recipe.Recipe.steps = !steps;
-			T_recipe.Recipe.ingridients = !ingridients;
+		{
+			T_recipe.name = $2;
+			T_recipe.steps = !steps;
+			T_recipe.ingridients = !ingridients;
 		}
 	}
 
@@ -37,7 +32,7 @@ recipe_entries:
 		let s = T_recipe.Step.make $3 in
 		Fr_type.Step s :: $4
 	}
-	| Component Quoted recipe_entries {
+	| Ingridient Quoted recipe_entries {
 		let s = T_recipe.Ingridient.make $2 in
 		Fr_type.Ingridient s :: $3
 	}

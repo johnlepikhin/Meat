@@ -54,6 +54,6 @@ let search_form ~selected_ingridients ~selected_properties req =
 	in
 	lwt_get_form
 		~a:[a_id FS.form_id]
-		~sp:(Processor.Page.sp req)
+		~sp:(Processor.Xhtml.sp req)
  		~service:Services.search_results
 		generator

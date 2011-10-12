@@ -31,22 +31,11 @@ let ingridients_to_html = List.map ingridient_to_html
 let recipe_to_html r =
 	div ~a:[a_class Css_main.Recipe.container_div; a_id Common.Recipe.container_div_id] [
 		div ~a:[a_class Css_main.Recipe.name_div] [
-			text r.T_recipe.Recipe.name
+			text r.T_recipe.name
 		];
-		div ~a:[a_class Css_main.Recipe.ingridients_div] (ingridients_to_html r.T_recipe.Recipe.ingridients);
-		div ~a:[a_class Css_main.Recipe.steps_div] (steps_to_html r.T_recipe.Recipe.steps);
+		div ~a:[a_class Css_main.Recipe.ingridients_div] (ingridients_to_html r.T_recipe.ingridients);
+		div ~a:[a_class Css_main.Recipe.steps_div] (steps_to_html r.T_recipe.steps);
 	]
-
-let component_to_html r =
-	div ~a:[a_class Css_main.Component.content_div; a_id Common.Recipe.container_div_id] [
-		div ~a:[a_class Css_main.Component.name_div] [
-			text r.T_recipe.Component.name
-		];
-	]
-
-let result_to_html = function
-	| T_recipe.Recipe r -> recipe_to_html r
-	| T_recipe.Component r -> component_to_html r
 
 let parse s =
 	try
@@ -65,5 +54,5 @@ let have_errors s =
 let to_html s =
 	let r = parse s in
 	match r with
-		| Some r -> Some (result_to_html r)
+		| Some r -> Some (recipe_to_html r)
 		| None -> None

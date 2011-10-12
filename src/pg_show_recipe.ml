@@ -11,11 +11,11 @@ let get_ingridients id =
 		where ingridient.orig_id=$id")
 
 let f req =
-	lwt r = get (Processor.Page.get req) in
+	lwt r = get (Processor.Xhtml.get req) in
 	match r with
 		| [(id, name, text, ingridients_count)] ->
 			lwt ingridients = get_ingridients id in
-			Processor.Page.add_js_var req Common.Recipe.name_var name;
+			Processor.Xhtml.add_js_var req Common.Recipe.name_var name;
 			D_show_recipe.f ~ingridients_count ~ingridients ~text req
 		| _ ->
 			D_show_recipe.not_found req

@@ -21,7 +21,7 @@ end
 
 module JsVarsBlock = struct
 	let block req =
-		Processor.Page.add_js_var req Common.page_name_var req.T_processor.Page.page_type;
+		Processor.Xhtml.add_js_var req Common.page_name_var req.T_processor.Page.page_type;
 		let buf = Buffer.create 16300 in
 		let rec loop = function
 			| [] -> ()
@@ -32,7 +32,7 @@ module JsVarsBlock = struct
 				Buffer.add_string buf "';";
 				loop tl
 		in
-		loop (Processor.Page.js_vars req);
+		loop (Processor.Xhtml.js_vars req);
 		let script = XHTML.M.cdata_script (Buffer.contents buf) in
 		Lwt.return <<
 			<script type="text/javascript">$script$</script>

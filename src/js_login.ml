@@ -17,30 +17,39 @@ let password_input = EID.init C.Login.password_input_id DH.CoerceTo.input
 let username_submit = EID.init C.Login.username_submit_id DH.CoerceTo.input
 let username_div = EID.div C.Login.username_div_id
 
-let cookie_name = "eliompersistentsession|"
+module SeedC = Js_API.MakeC(API.Seed)
+module LoginC = Js_API.MakeC(API.Login)
+module LogoutC = Js_API.MakeC(API.Logout)
+module UserInfoC = Js_API.MakeC(API.UserInfo)
 
-let storage_userinfo = "userinfo"
+module UserInfoStorage = Js_storage.MlExpirable(struct type t = API.UserInfo.t let name = "userinfo" end)
+
+let cookie_name = "eliompersistentsession|"
 
 let have_cookie () =
 	Js_cookie.exists cookie_name
 
-let set_userinfo v =
-	Js_storage.Common.set ~timeout:3600. ~name:storage_userinfo v
+let set_userinfo = UserInfoStorage.set ~timeout:3600.
 
 let update_userinfo () =
-	lwt info = Js_API.request ~args:[] Common.API.path_userinfo in
-	set_userinfo info;
-	Lwt.return info
+	lwt info = UserInfoC.q [] in
+	match info with
+		| API.Error s ->
+			alert ("Не удалось получить данные пользователя: " ^ s);
+			Lwt.return None
+		| API.Data info ->
+			set_userinfo info;
+			Lwt.return info
 
 let get_userinfo () =
 	if have_cookie () then
 		try_lwt
-			let info : API.Login.info option option = Js_storage.Common.get storage_userinfo in
-			match info with
-				| Some info ->
-				 	Lwt.return info
-				| None ->
-					update_userinfo ()
+			lwt v = UserInfoStorage.get () in
+			let v = match v with
+				| None -> None
+				| Some v -> v
+			in
+			Lwt.return v
 		with
 			| _ -> update_userinfo ()
 	else
@@ -69,19 +78,24 @@ let logged_in info =
 	Lwt.return ()
 
 let do_login user password =
-	lwt seed = Js_API.request ~args:[] C.API.path_seed in
-	let hash = Js_password.encrypt_plain ~seed password in
-	let args = [
-		"username", user;
-		"hash", hash;
-	] in
-	lwt r = Js_API.request ~args C.API.path_login in
-	match r with
-		| API.Login.Ok info ->
-			logged_in info
-		| API.Login.Error -> 
-			alert "Не правильное имя пользователя или пароль.";
+	lwt seed = SeedC.q [] in
+	match seed with
+		| API.Error s ->
+			alert ("Не удалось войти т.к. не получили seed: " ^ s ^ ". Попробуйте еще раз.");
 			Lwt.return ()
+		| API.Data seed ->
+			let hash = Js_password.encrypt_plain ~seed password in
+			let args = [
+				"username", user;
+				"hash", hash;
+			] in
+			lwt r = LoginC.q args in
+			match r with
+				| API.Data info ->
+					logged_in info
+				| API.Error s ->
+					alert s;
+					Lwt.return ()
 
 let processing_login = ref false
 
@@ -126,11 +140,11 @@ let login_pressed _ =
 		
 
 let do_logout _ =
-	lwt r = Js_API.request ~args:[] C.API.path_logout in
+	lwt r = LogoutC.q [] in
 	match r with
-		| API.Action.Ok ->
+		| API.Data _ ->
 			logged_out ()
-		| API.Action.Error s ->
+		| API.Error s ->
 			alert s;
 			Lwt.return ()
 

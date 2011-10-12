@@ -2,7 +2,7 @@
 open Eliom_predefmod
 
 let xhtml ~service ~page_type f =
-	Xhtmlcompact.register ~service (Processor.Page.call ~f ~page_type)
+	Xhtmlcompact.register ~service (Processor.Xhtml.call ~f ~page_type)
 
 let main = xhtml ~service:Services.main ~page_type:API.Page.Main Pg_main.f
 
@@ -18,7 +18,7 @@ module API = struct
 
 	let make service f =
 		let f sp get post =
-			lwt r = Processor.Common.call ~f sp () post in
+			lwt r = Processor.PAPI.call ~f sp () post in
 			Lwt.return (r, content_type)
 		in
 		let error_handler sp _ =

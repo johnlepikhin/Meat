@@ -22,7 +22,7 @@ let show_recipe = new_service
 	()
 
 module API = struct
-	module C = Common.API
+	module A = API
 
 	let no_post_params path = new_service
 		~path
@@ -30,17 +30,18 @@ module API = struct
 		()
 
 	let api path params =
+		let path = "api" :: path in
 		let fallback = no_post_params path in
 		let service = new_post_service ~fallback ~post_params:params () in
 		fallback, service
 
-	let recipe_name_complete = api C.path_recipe_name_complete (string "q")
-	let recipe_ingridients = api C.path_recipe_ingridients (string "q")
-	let recipe_get = api C.path_recipe_get (string "q")
-	let recipe_set = api C.path_recipe_set (string "q" ** string "text")
+	let recipe_name_complete = api A.RecipeNameComplete.path (string "q")
+	let recipe_ingridients = api A.RecipeIngridients.path (string "q")
+	let recipe_get = api A.RecipeGet.path (string "q")
+	let recipe_set = api A.RecipeSet.path (string "q" ** string "text")
 
-	let login = api C.path_login (string "username" ** string "hash")
-	let logout = api C.path_logout unit
-	let seed = api C.path_seed unit
-	let userinfo = api C.path_userinfo unit
+	let login = api A.Login.path (string "username" ** string "hash")
+	let logout = api A.Logout.path unit
+	let seed = api A.Seed.path unit
+	let userinfo = api A.UserInfo.path unit
 end

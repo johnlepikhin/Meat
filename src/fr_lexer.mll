@@ -8,8 +8,8 @@ let lident = ['a'-'z']+
 
 rule recipe = parse
 	| "recipe" { Recipe }
-	| "component" { Component }
 	| "step" { Step }
+	| "ingridient" { Ingridient }
 	| '"' {
 		let buf = Buffer.create 16380 in
 		quoted buf true lexbuf;

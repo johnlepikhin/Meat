@@ -53,15 +53,30 @@ let request ~args func =
 	lwt url = URL.make func [] in
 	lwt r = XmlHttpRequest.perform ~post_args:args url in
 	if (r.XmlHttpRequest.code = 200) then
-	begin
-		let r = API.of_string r.XmlHttpRequest.content in
-		match r with
-			| None ->
-				protocol_error "Получены некорректные данные от сервера"
-			| Some (API.Data v) ->
-				Lwt.return v
-			| Some (API.Error s) ->
-				protocol_error s
-	end
+		Lwt.return r.XmlHttpRequest.content
 	else
-		protocol_error ("HTTP response code = " ^ (string_of_int r.XmlHttpRequest.code) ^ "\n\n" ^ r.XmlHttpRequest.content)
+		protocol_error ("HTTP response code = " ^ (string_of_int r.XmlHttpRequest.code) ^ "\n\n" ^ r.XmlHttpRequest.content);
+
+module type CLIENT = sig
+	type t
+
+	val path: string list
+end
+
+module MakeC (C : CLIENT) = struct
+	let of_string s =
+		lwt r = API.of_string s in
+		let r : C.t = r in
+		Lwt.return r
+
+	let to_string (v : C.t) = API.to_string v
+
+	let q args : C.t API.t Lwt.t =
+		lwt s = request ~args ("api" :: C.path) in
+		try_lwt
+			lwt r = API.of_string s in
+			let r : C.t API.t = r in
+			Lwt.return r
+		with
+			| e -> protocol_error ("Получены некорректные данные от сервера:" ^ (Printexc.to_string e))
+end

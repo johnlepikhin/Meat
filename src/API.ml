@@ -8,12 +8,6 @@ module Page = struct
 		| ShowRecipe
 end
 
-module Action = struct
-	type t =
-		| Ok
-		| Error of string
-end
-
 module SearchForm = struct
 	type autocomplete_list = string list
 end
@@ -24,30 +18,66 @@ module SearchResults = struct
 	type ids_list = int list
 end
 
+module RecipeNameComplete = struct
+	type t = string list
+
+	let path = ["recipe"; "name"; "complete"]
+end
+
+module RecipeIngridients = struct
+	type t = string list
+
+	let path = ["recipe"; "ingridients"]
+end
+
 module Recipe = struct
 	type name = string
 
-	type info = {
+	type t = {
 		title : string;
 		text : string;
 	}
 end
 
+module RecipeSet = struct
+	type t = unit
+
+	let path = ["recipe"; "set"]
+end
+
+module RecipeGet = struct
+	type t = Recipe.t
+
+	let path = ["recipe"; "get"]
+end
+
 module Seed = struct
 	type t = string
+
+	let path = ["seed"]
 end
 
 module Login = struct
-	type info = {
+	type t = {
 		username : string;
 		first_name : string;
 		last_name : string option;
 		person : string;
 	}
 
-	type t =
-		| Ok of info
-		| Error
+	let path = ["login"]
+end
+
+module Logout = struct
+	type t = unit
+
+	let path = ["logout"]
+end
+
+module UserInfo = struct
+	type t = Login.t option
+
+	let path = ["userinfo"]
 end
 
 type 'a t =

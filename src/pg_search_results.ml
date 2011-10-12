@@ -60,7 +60,7 @@ let split =
 	Pcre.split ~rex
 
 let f req =
-	let (selected_ingridients, selected_properties) = Processor.Page.get req in
+	let (selected_ingridients, selected_properties) = Processor.Xhtml.get req in
 	let search_f = search ~properties:selected_properties ~ingridients:selected_ingridients in
 	lwt results = search_f ~offset:0L in
 	D_search_results.main req results

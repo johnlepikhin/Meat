@@ -10,7 +10,7 @@ let search_results req results =
 		(fun (name, ingridient_count) ->
 		 	incr id;
 			id_list := !id :: !id_list;
-		 	let link = a Services.show_recipe (Processor.Page.sp req) [pcdata name] name in
+		 	let link = a Services.show_recipe (Processor.Xhtml.sp req) [pcdata name] name in
 		 	<<
 				<tr class=$CR.element_tr$>
 					<td class=$CR.name_td$>
@@ -31,7 +31,7 @@ let search_results req results =
 	>>
 
 let main req results =
-	let (selected_ingridients, selected_properties) = Processor.Page.get req in
+	let (selected_ingridients, selected_properties) = Processor.Xhtml.get req in
 	lwt f = D_search_form.search_form ~selected_ingridients ~selected_properties req in
 	let results = search_results req results in
 	lwt r = Page_template.main req <<

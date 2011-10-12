@@ -11,6 +11,8 @@ module Ingridients = struct
 	module FS = C.Search
 	module CF = Css_main.Search.Form
 
+	module RecipeNameCompleteC = Js_API.MakeC(API.RecipeNameComplete)
+
 	let input_ingridient = EID.init FS.ingridient_id DH.CoerceTo.input
 	let form = EID.init FS.form_id DH.CoerceTo.form
 
@@ -76,6 +78,7 @@ module Ingridients = struct
 
 	module Autocomplete = struct
 		module CF = CF.Ingridients.Autocomplete
+
 
 		let autocomplete_div = EID.div FS.autocomplete_id
 
@@ -190,9 +193,13 @@ module Ingridients = struct
 				let v = to_string (el##value) in
 				if v <> !last_text && String.length v > 0 then
 				begin
-					lwt lst = Js_API.request ~args:["q", v] Common.API.path_recipe_name_complete in
-					last_text := v;
-					Autocomplete.init lst
+					lwt lst = RecipeNameCompleteC.q ["q", v] in
+					match lst with
+						| API.Error _ ->
+							Lwt.return ()
+						| API.Data lst ->
+							last_text := v;
+							Autocomplete.init lst
 				end
 				else
 					Lwt.return ()

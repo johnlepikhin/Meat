@@ -1,6 +1,16 @@
 
-module Common = struct
+module type PAGE = sig
+	type page
+
+	val page_of_error: string -> page
+end
+
+module Make (P : PAGE) = struct
 	open T_processor.Common
+
+	exception Fail of string
+
+	let fail v = Lwt.fail (Fail v)
 
 	let get_userinfo sp () =
 		lwt user = Eliom_sessions.get_persistent_session_data ~table:Session.User.user ~sp () in
@@ -26,6 +36,10 @@ module Common = struct
 				lwt _ = PGSQL(db) "commit" in
 				Lwt.return r
 			with
+				| Fail v ->
+					lwt _ = PGSQL(db) "rollback" in
+					let v = P.page_of_error v in
+					Lwt.return v
 				| e ->
 					lwt _ = PGSQL(db) "rollback" in
 					Lwt.fail e
@@ -34,9 +48,22 @@ module Common = struct
 	let userinfo t = Lazy.force t.userinfo
 end
 
-module Page = struct
+module Xhtml = struct
 	open T_processor.Page
 	module C = T_processor.Common
+
+	module Common = Make(struct
+		type page = [ `Html ] XHTML.M.elt
+
+		let page_of_error s = <<
+			<html>
+				<body>
+					<h1>Произошла непредвиденная ошибка</h1>
+					<div>$str:s$</div>
+				</body>
+			</html>
+		>>
+	end)
 
 	let call ~f ~page_type sp get post =
 		let f common =
@@ -67,3 +94,9 @@ module Page = struct
 		let value = API.to_string value in
 		t.js_vars <- (name, value) :: t.js_vars
 end
+
+module PAPI = Make(struct
+	type page = string
+
+	let page_of_error s = API.to_string (API.Error s)
+end)

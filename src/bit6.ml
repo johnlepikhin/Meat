@@ -69,6 +69,6 @@ let bit6_to_a s =
 	let v = decode s in
 	try
 		let v = Marshal.from_string v 0 in
-		Some v
+		Lwt.return v
 	with
-		| _ -> None
+		| _ -> Lwt.fail Not_found

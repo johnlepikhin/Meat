@@ -41,8 +41,12 @@ module GlobalMlVar = functor(N : GLOBAL_ML_VAR) -> struct
 			| None -> Lwt.return None
 			| Some v ->
 				let v = Js.to_string v in
-				let r : N.t option = API.of_string v in
-				Lwt.return r
+				try_lwt
+					lwt v = API.of_string v in
+					let v : N.t option = Some v in
+					Lwt.return v
+				with
+					| _ -> Lwt.return None
 
 	let get () : N.t Lwt.t =
 		lwt r = get_opt () in

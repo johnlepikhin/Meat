@@ -6,6 +6,7 @@
 <d_*.ml>: pkg_ocsigen_xhtml.syntax
 <js_*.ml>: pkg_js_of_ocaml, pkg_js_of_ocaml.syntax
 <l_HTML*.ml>: pkg_ocsigen_xhtml
+"processor.ml": pkg_ocsigen_xhtml.syntax
 "page_template.ml": pkg_ocsigen_xhtml.syntax
 "eliom_no_meat.ml": pkg_ocsigen.ext.eliom
 <*.cmxa>: pkg_pgocaml

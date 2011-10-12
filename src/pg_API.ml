@@ -53,16 +53,26 @@ let recipe_get req =
 
 let recipe_set req =
 	let (name, text) = req.R.post in
-	if Fr_parse.have_errors text then
-		ok (API.Action.Error "Описание рецепта содержит ошибки!")
-	else
-		lwt r = PGSQL(req.R.db) "select id from recipe where name=$name" in
-		match r with
-			| [_] ->
-				lwt _ = PGSQL(req.R.db) "update recipe set text=$text where name=$name" in
-				ok (API.Action.Ok)
-			| _ ->
-				ok (API.Action.Error "Рецепт с таким именем не найден")
+	let recipe = Fr_parse.parse text in
+	match recipe with
+		| None -> Processor.PAPI.fail "Описание рецепта содержит ошибки!"
+		| Some recipe ->
+			lwt r = PGSQL(req.R.db) "select id from recipe where name=$name" in
+			match r with
+				| [(id)] ->
+					let ingridient_count = Int32.of_int (List.length recipe.T_recipe.ingridients) in
+					lwt _ = PGSQL(req.R.db) "delete from ingridient where orig_id=$id" in
+					lwt _ = Lwt_list.iter_s (fun i ->
+						let name = i.T_recipe.Ingridient.name in
+						lwt ing_id = PGSQL(req.R.db) "select id from recipe where name=$name" in
+						match ing_id with
+							| [(ing_id)] -> PGSQL(req.R.db) "insert into ingridient (orig_id, ref_id) values ($id, $ing_id)"
+							| _ -> Processor.PAPI.fail ("Ингридиент с именем '" ^ name ^ "' не найден")
+					) recipe.T_recipe.ingridients in
+					lwt _ = PGSQL(req.R.db) "update recipe set text=$text, ingridient_count=$ingridient_count where name=$name" in
+					ok ()
+				| _ ->
+					Processor.PAPI.fail "Рецепт с таким именем не найден"
 
 let get_seed req =
 	let v = Eliom_sessions.get_volatile_session_data ~sp:req.R.sp ~table:Session.seed () in
@@ -87,7 +97,7 @@ let login req =
 		from users
 		where username=$username"
 	in
-	lwt r = match row with
+	match row with
 		| [id, username, firstname, lastname, password] when hash = Ml_password.encrypt_seed_hash ~seed password ->
 			let person = match lastname with
 				| Some l -> firstname ^ " " ^ l
@@ -105,20 +115,18 @@ let login req =
 			} in
 			lwt _ = Eliom_sessions.set_persistent_session_data ~table:Session.User.user ~sp:req.R.sp t in
 			req.R.userinfo <- Lazy.lazy_from_fun (fun () -> Lwt.return (Some t));
-			Lwt.return (API.Login.Ok info)
+			ok info
 		| _ ->
 			lwt _ = Lwt_unix.sleep (Random.float 3.) in
-			Lwt.return API.Login.Error
-	in
-	ok r
+			error "Неправильное имя пользователя или пароль)"
 
 let logout req =
 	lwt _ = Eliom_sessions.remove_persistent_session_data ~sp:req.R.sp ~table:Session.User.user () in
 	req.R.userinfo <- Lazy.lazy_from_fun (fun () -> Lwt.return None);
-	ok API.Action.Ok
+	ok ()
 
 let userinfo req =
-	lwt ui = Processor.Common.userinfo req in
+	lwt ui = Processor.PAPI.userinfo req in
 	let ui = match ui with
 		| Some u -> Some u.Session.User.info
 		| None -> None
